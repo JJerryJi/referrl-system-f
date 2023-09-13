@@ -1,8 +1,10 @@
 // @mui
 import PropTypes from 'prop-types';
-import { Box, Card, Paper, Typography, CardHeader, CardContent } from '@mui/material';
+import { Box, Card, Paper, Typography, CardHeader, CardContent, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 // utils
-import { fShortenNumber } from '../../../utils/formatNumber';
+
+// import Button from 'src/theme/overrides/Button';
 
 // ----------------------------------------------------------------------
 
@@ -13,6 +15,7 @@ AppTrafficBySite.propTypes = {
 };
 
 export default function AppTrafficBySite({ title, subheader, list, ...other }) {
+  const navigate = useNavigate()
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -25,15 +28,18 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
             gridTemplateColumns: 'repeat(2, 1fr)',
           }}
         >
-          {list.map((site) => (
-            <Paper key={site.name} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
-              <Box sx={{ mb: 0.5 }}>{site.icon}</Box>
+          {list.map((job) => (
+            <Paper key={job.job_id} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
+              <Typography variant="h6">{job.job_company}</Typography>
 
-              <Typography variant="h6">{fShortenNumber(site.value)}</Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {site.name}
+              <Typography variant="body3" sx={{ color: 'text.secondary' }}>
+                {' '}
+                {job.job_name}{' '}
               </Typography>
+              <Box>
+                {' '}
+                <Button sx={{ color: 'text.secondary' }} onClick={()=>{navigate(`/dashboard/job-posts/${job.job_id}`)}}>Learn more about this Job</Button>
+              </Box>
             </Paper>
           ))}
         </Box>

@@ -9,7 +9,8 @@ import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
-
+import DetailedJobPostPage from './pages/DetailedJobPostPage';
+import SignupPage from './pages/SignupPage';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -18,16 +19,21 @@ export default function Router() {
       path: '/dashboard',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
+        { element: <Navigate to="/dashboard/job-posts" />, index: true },
+        { path: 'job-posts', element: <DashboardAppPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'job-posts/:jobId', element: <DetailedJobPostPage />},
       ],
     },
     {
       path: 'login',
       element: <LoginPage />,
+    },
+    {
+      path: 'signup',
+      element: <SignupPage />,
     },
     {
       element: <SimpleLayout />,
