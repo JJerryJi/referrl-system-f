@@ -1,49 +1,138 @@
 import { Helmet } from 'react-helmet-async';
+import { sentenceCase } from 'change-case';
+import Cookies from 'universal-cookie';
+import { useEffect, useState } from 'react';
+
 // @mui
-import { Grid, Button, Container, Stack, Typography } from '@mui/material';
+import {
+  Card,
+  Table,
+  Stack,
+  Paper,
+  Avatar,
+  Button,
+  Popover,
+  Checkbox,
+  TableRow,
+  MenuItem,
+  TableBody,
+  TableCell,
+  Container,
+  Typography,
+  IconButton,
+  TableContainer,
+  TablePagination,
+} from '@mui/material';
 // components
-import Iconify from '../components/iconify';
-import { BlogPostCard, BlogPostsSort, BlogPostsSearch } from '../sections/@dashboard/blog';
-// mock
-import POSTS from '../_mock/blog';
+import Label from '../components/label';
+import Scrollbar from '../components/scrollbar';
+// sections
+import { UserListHead } from '../sections/@dashboard/user';
+import { fDateTime } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
-const SORT_OPTIONS = [
-  { value: 'latest', label: 'Latest' },
-  { value: 'popular', label: 'Popular' },
-  { value: 'oldest', label: 'Oldest' },
+const TABLE_HEAD = [
+  { id: 'application_id', label: 'Application ID', alignRight: false },
+  { id: 'Job ID', label: 'Job ID', alignRight: false },
+  { id: 'date', label: 'Applied Date', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'button', label: 'Button', alignRight: false}
 ];
 
 // ----------------------------------------------------------------------
 
-export default function BlogPage() {
+export default function UserPage() {
+  const cookies = new Cookies();
+  const token = cookies.get('token');
+  console.log(token);
+  const [applications, setApplications] = useState([]);
+
+  const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
+
+  useEffect(() => {
+    // Fetch applications with authorization header
+    async function fetchApplications() {
+      try {
+        const response = await fetch(ApplicationEndpoint, {
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setApplications(data.application);
+        console.log(data.application);
+      } catch (error) {
+        console.error('Error fetching applications:', error);
+      }
+    }
+    fetchApplications();
+  }, [token]);
+
   return (
     <>
       <Helmet>
-        <title> Dashboard: Blog | Minimal UI </title>
+        <title> User | Minimal UI </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Blog
+            My Applications
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New Post
-          </Button>
         </Stack>
 
-        <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
-          <BlogPostsSearch posts={POSTS} />
-          <BlogPostsSort options={SORT_OPTIONS} />
-        </Stack>
+        <Card>
+          <Scrollbar>
+            <TableContainer sx={{ minWidth: 800 }}>
+              <Table>
+                <UserListHead headLabel={TABLE_HEAD} />
+                <TableBody>
+                  {applications.map((application) => {
+                    /* eslint-disable camelcase */
+                    const { id, job_id, application_date, status } = application;
+                    /* eslint-disable camelcase */
 
-        <Grid container spacing={3}>
-          {POSTS.map((post, index) => (
-            <BlogPostCard key={post.id} post={post} index={index} />
-          ))}
-        </Grid>
+                    return (
+                      <TableRow hover key={id} tabIndex={-1}>
+                        <TableCell component="th" scope="row" padding="none" >
+                          <Stack direction="row" alignItems="center" spacing={2} sx={{ml:'25%'}}>
+                            <Typography variant="subtitle2" noWrap >
+                              {id}
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+
+                        <TableCell align="left">{job_id}</TableCell>
+
+                        <TableCell align="left">
+                          {fDateTime(application_date)} {/* Make sure to format the date as needed */}
+                        </TableCell>
+
+                        <TableCell align="left">
+                          <Label color={(status === 'In Progress' && 'info') || (status === 'Not-moving-forward' && 'error') || 'success'}>
+                            {sentenceCase(status)}
+                          </Label>
+                        </TableCell>
+
+                        <TableCell align="left">
+                          {(status === "In Progress") && <Button size='small' color='info' variant='contained'> 
+                            Modify Application
+                          </Button>}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+        </Card>
       </Container>
     </>
   );
