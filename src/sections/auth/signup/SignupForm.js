@@ -23,10 +23,10 @@ export default function SignupForm() {
     major: '',
     degree: '',
     graduation_year: '',
+    year: '',
     graduation_month: '',
     company_name: '',
   });
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,74 +44,75 @@ export default function SignupForm() {
     // Define required fields for each role
     const requiredFields = {
       common: ['username', 'password', 'location', 'email', 'first_name', 'last_name', 'role'],
-      student: ['school', 'year_in_school', 'major', 'degree', 'graduation_year', 'graduation_month'],
+      student: ['school', 'year_in_school', 'major', 'degree', 'year', 'graduation_month'],
       alumni: ['company_name'],
     };
-  
+
     // Check common fields
     let error = null;
     requiredFields.common.forEach((field) => {
       if (!formData[field]) {
-        setErrorMessage (`Missing required field: ${field}`);
+        setErrorMessage(`Missing required field: ${field}`);
         error = `Missing required field: ${field}`;
+        console.log(error);
       }
     });
-  
+
     // Check role-specific fields
     if (!error && (formData.role === 'student' || formData.role === 'alumni')) {
       requiredFields[formData.role].forEach((field) => {
         if (!formData[field]) {
           setErrorMessage(`Missing required field: ${field}`);
-          error =  `Missing required field: ${field}`;
+          error = `Missing required field: ${field}`;
+          console.log(error);
         }
       });
     }
-  
+
     // If no missing fields, return null
     return error;
   };
 
   const handleSubmit = () => {
-    if (validateForm()) {
+    const result = validateForm();
+    console.log(result);
+    if (result === null) {
       // Combine graduation_year and graduation_month into a date-time string
-      formData.graduation_year = `${formData.graduation_year}-${String(formData.graduation_month).padStart(2, '0')}-01T00:00:00`;
-  
+      formData.graduation_year = `${formData.year}-${String(formData.graduation_month).padStart(
+        2,
+        '0'
+      )}-01T00:00:00`;
+
       console.log(formData);
-  
+
       // call backend API according to user type
       fetch(`http://127.0.0.1:8000/user/api/${formData.role}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...formData})
+        body: JSON.stringify({ ...formData }),
       })
-      .then((response) => {
-        if (!response.ok) {
-          // If the response is not OK, throw an error with the status text
-          throw new Error(response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        // If the request was successful, clear the error message
-        setSuccessMessage(data.message);
-        setErrorMessage(null);
-        
-        navigate('/login');
-      })
-      .catch((error) => {
-        const err = error.json()
-        console.log('An error occurred:', error);
-        // If an error occurred, set the error message
-        setErrorMessage(err.message);
-        setSuccessMessage(null);
-      });
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          if (data.success===false){
+            setSuccessMessage(null);
+            setErrorMessage(data.error);
+          }
+          else if (data.success === true) {
+          setSuccessMessage(data.message);
+          console.log(successMessage);
+          setErrorMessage(null);
+          throw new Error(data.message);
+          }
+
+          // navigate('/login');
+        })
     }
   };
-  
-  
 
   return (
     <>
@@ -136,7 +137,7 @@ export default function SignupForm() {
         />
         <FormControl fullWidth>
           <InputLabel>User Type</InputLabel>
-          <Select name="role" value={formData.role} onChange={handleInputChange} label='User Type' fullWidth>
+          <Select name="role" value={formData.role} onChange={handleInputChange} label="User Type" fullWidth>
             <MenuItem value="student">Student</MenuItem>
             <MenuItem value="alumni">Alumni</MenuItem>
           </Select>
@@ -146,7 +147,13 @@ export default function SignupForm() {
             <TextField name="school" label="School" value={formData.school} onChange={handleInputChange} fullWidth />
             <FormControl fullWidth>
               <InputLabel>Year in School</InputLabel>
-              <Select name="year_in_school" value={formData.year_in_school} onChange={handleInputChange} label='Year in School' fullWidth>
+              <Select
+                name="year_in_school"
+                value={formData.year_in_school}
+                onChange={handleInputChange}
+                label="Year in School"
+                fullWidth
+              >
                 <MenuItem value={1}>1</MenuItem>
                 <MenuItem value={2}>2</MenuItem>
                 <MenuItem value={3}>3</MenuItem>
@@ -157,31 +164,40 @@ export default function SignupForm() {
             <TextField name="major" label="Major" value={formData.major} onChange={handleInputChange} fullWidth />
             <FormControl fullWidth>
               <InputLabel>Degree</InputLabel>
-              <Select name="degree" value={formData.degree} onChange={handleInputChange} label='Degree'>
+              <Select name="degree" value={formData.degree} onChange={handleInputChange} label="Degree">
                 <MenuItem value="BS">Bacholor of Science</MenuItem>
                 <MenuItem value="MS">Master of Science</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
               <InputLabel>Graduation Year</InputLabel>
-              <Select name="graduation_year" value={formData.graduation_year} onChange={handleInputChange} label='Graduation Year'>
+              <Select
+                name="year"
+                value={formData.year}
+                onChange={handleInputChange}
+                label="Graduation Year"
+              >
                 {years.map((year) => (
                   <MenuItem key={year} value={year}>
                     {year}
                   </MenuItem>
                 ))}
               </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>Graduation Month</InputLabel>
-                <Select name="graduation_month" value={formData.graduation_month} onChange={handleInputChange} label='Graduation Month'>
-                  {months.map((month) => (
-                    <MenuItem key={month} value={month}>
-                      {month}
-                    </MenuItem>
-                  ))}
-                </Select>
-              
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Graduation Month</InputLabel>
+              <Select
+                name="graduation_month"
+                value={formData.graduation_month}
+                onChange={handleInputChange}
+                label="Graduation Month"
+              >
+                {months.map((month) => (
+                  <MenuItem key={month} value={month}>
+                    {month}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Stack>
         )}
@@ -221,9 +237,13 @@ export default function SignupForm() {
       >
         Signup
       </LoadingButton>
-      <Stack alignItems="center" sx={{ my: 2 }}> 
-      {errorMessage && <Alert size='large' severity='error'> Error: {errorMessage} </Alert>}
-      {successMessage && <Alert size='large'> Error: {successMessage} </Alert>}
+      <Stack alignItems="center" sx={{ my: 2 }}>
+        {errorMessage && (
+          <Alert size="large" sx={{whiteSpace:'pre-line'}} severity="error">
+            Error: {errorMessage}
+          </Alert>
+        )}
+        {successMessage && <Alert size="large"> {successMessage} </Alert>}
       </Stack>
     </>
   );

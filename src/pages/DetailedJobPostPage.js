@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams,useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import { sentenceCase } from 'change-case';
@@ -19,12 +19,11 @@ import {
   TableContainer,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useTheme } from '@mui/material/styles';
 
 import Scrollbar from '../components/scrollbar';
 
 export default function DetailedJobPostPage() {
-  const theme = useTheme();
+    const navigate = useNavigate();
   const authToken = new Cookies().get('token');
   const [jobPost, setJobPost] = useState({});
   const [errMsg, setErrMsg] = useState();
@@ -98,7 +97,7 @@ export default function DetailedJobPostPage() {
                   </TableContainer>
                 </Scrollbar>
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                  <LoadingButton size="large" variant="contained" onClick={()=>{}}>
+                  <LoadingButton size="large" variant="contained" onClick={()=>{navigate(`/dashboard/application/${jobId}`)}}>
                     Apply for this Job
                   </LoadingButton>
                 </div>
