@@ -79,10 +79,8 @@ export default function SubmitApplicationPage() {
         setErrorMessage(data.error);
       }
     } catch (error) {
-      const err = await error.json();
-      console.log(err.error);
-      setErrorMessage(err.message);
-      console.error('Error:', err);
+      console.error('Error:', error);
+      throw new Error(error)
     }
   };
 
@@ -140,7 +138,7 @@ export default function SubmitApplicationPage() {
                       size="large"
                       variant="contained"
                       onClick={() => {
-                        navigate(`/dashboard/job-posts/${jobId}`);
+                        navigate(`/dashboard/job-posts/`);
                       }}
                     >
                       Back to All Job Posts

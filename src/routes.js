@@ -13,6 +13,7 @@ import DetailedJobPostPage from './pages/DetailedJobPostPage';
 import SignupPage from './pages/SignupPage';
 import SubmitApplicationPage from './pages/SubmitApplicationPage'
 import EditApplicationPage from './pages/EditApplicationPage';
+import NewJobPage from './pages/NewJobPage'
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -26,6 +27,7 @@ export default function Router() {
         { path: 'job-posts/:jobId', element: <DetailedJobPostPage />},
         { path: 'application/:jobId', element: <SubmitApplicationPage />},
         { path: 'edit-application/:applicationId', element: <EditApplicationPage />},
+        { path: 'new-job-posts', element: <NewJobPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'application', element: <BlogPage /> },

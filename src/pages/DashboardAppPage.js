@@ -1,13 +1,16 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Grid, Container, Typography, Stack, Button } from '@mui/material';
 import Cookies from 'universal-cookie';
 import Iconify from '../components/iconify';
+
 
 import { AppTrafficBySite } from '../sections/@dashboard/app'; // Import AppJobPosts instead of AppTrafficBySite
 // ...
 
 export default function DashboardAppPage() {
+  const navigate = useNavigate();
   const cookies = new Cookies();
   const authToken = cookies.get('token');
   console.log(authToken);
@@ -41,7 +44,7 @@ export default function DashboardAppPage() {
             Here are all job posts
           </Typography>
 
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={()=>{navigate('/dashboard/new-job-posts')}}>
             New Job Post
           </Button>
         </Stack>
