@@ -141,7 +141,7 @@ export default function SubmitApplicationPage() {
                         navigate(`/dashboard/job-posts/${jobId}`);
                       }}
                     >
-                      Cancel this application
+                      Back to All Job Posts
                     </LoadingButton>
                   </div>
                   {errorMessage && !successMessage && (
@@ -155,6 +155,7 @@ export default function SubmitApplicationPage() {
                       {' '}
                       {successMessage}
                     </Alert>
+                    
                   )}
                 </Scrollbar>
               </CardContent>

@@ -1,7 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect } from 'react';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Container, Typography, Stack, Button } from '@mui/material';
 import Cookies from 'universal-cookie';
+import Iconify from '../components/iconify';
 
 import { AppTrafficBySite } from '../sections/@dashboard/app'; // Import AppJobPosts instead of AppTrafficBySite
 // ...
@@ -26,7 +27,7 @@ export default function DashboardAppPage() {
         const filteredJobPosts = data.job_post.filter((jobPost) => jobPost.job_review_status === 'Pass');
         setJobPosts(filteredJobPosts); // Update the jobPosts state with the filtered data
       });
-  }, []); 
+  }, []);
 
   return (
     <>
@@ -35,13 +36,18 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-        <Typography variant="h4" sx={{ mb: 5 }}>
-          Hi, Here are all job posts
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          <Typography variant="h4">
+            Hi, Here are all job posts
+          </Typography>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+            New Job Post
+          </Button>
+        </Stack>
 
         <Grid container spacing={3}>
           <Grid item xs={32} md={16} lg={16}>
-            <AppTrafficBySite title="Job Posts" list={jobPosts}/>
+            <AppTrafficBySite title="Job Posts" list={jobPosts} />
           </Grid>
         </Grid>
       </Container>
