@@ -38,8 +38,9 @@ export default function DashboardAppPage() {
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4">
-            Hi, Here are all job posts
+            Here are all job posts
           </Typography>
+
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
             New Job Post
           </Button>

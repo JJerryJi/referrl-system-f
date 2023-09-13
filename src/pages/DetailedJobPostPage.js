@@ -1,4 +1,4 @@
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
 import { sentenceCase } from 'change-case';
@@ -23,12 +23,13 @@ import { LoadingButton } from '@mui/lab';
 import Scrollbar from '../components/scrollbar';
 
 export default function DetailedJobPostPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const authToken = new Cookies().get('token');
   const [jobPost, setJobPost] = useState({});
   const [errMsg, setErrMsg] = useState();
+  const [applied, setApplied] = useState('');
   const jobId = useParams().jobId;
-  console.log(jobId);
+  console.log(authToken);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/job/api/posts/${jobId}`, {
@@ -38,7 +39,9 @@ export default function DetailedJobPostPage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.job_post.job_requirement);
+        console.log(data);
+        setApplied(data.has_student_applied_before);
+        console.log(applied)
         setJobPost(data.job_post);
       })
       .catch((error) => {
@@ -81,26 +84,44 @@ export default function DetailedJobPostPage() {
                               <TableCell component="th" scope="row" padding="none">
                                 <Stack direction="row" alignItems="center" spacing={2}>
                                   <Typography variant="subtitle2" noWrap>
-                                    {formattedKey} 
+                                    {formattedKey}
                                   </Typography>
                                 </Stack>
                               </TableCell>
-                              <TableCell align="left" sx={{ whiteSpace:"pre-wrap" }}>
-                                {value} 
+                              <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {value}
                               </TableCell>
                             </TableRow>
                           );
                         })}
                       </TableBody>
                     </Table>
-
                   </TableContainer>
                 </Scrollbar>
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                  <LoadingButton size="large" variant="contained" onClick={()=>{navigate(`/dashboard/application/${jobId}`)}}>
+                   <LoadingButton
+                    size="large"
+                    variant="contained"
+                    disabled={applied}
+                    onClick={() => {
+                      navigate(`/dashboard/application/${jobId}`);
+                    }}
+                  >
                     Apply for this Job
                   </LoadingButton>
                 </div>
+
+                { applied && <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                   <LoadingButton
+                    size="large"
+                    variant="contained"
+                    onClick={() => {
+                      navigate(`/dashboard/application`);
+                    }}
+                  >
+                    Go to Your Applications
+                  </LoadingButton>
+                </div>}
               </CardContent>
             </Card>
           </Grid>

@@ -71,6 +71,8 @@ export default function SubmitApplicationPage() {
       // Optionally, you can navigate or perform other actions here
       if (data.success===true) {
         console.log('Application submitted successfully');
+        setSuccessMessage('Application submitted successfully');
+        setErrorMessage('');
         // navigate(`/dashboard/job-posts/${jobId}`);
       } 
       else{
@@ -144,13 +146,13 @@ export default function SubmitApplicationPage() {
                       Back to All Job Posts
                     </LoadingButton>
                   </div>
-                  {errorMessage && !successMessage && (
+                  {errorMessage && (
                     <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
                       {' '}
                       {errorMessage}
                     </Alert>
                   )}
-                    {successMessage && !errorMessage (
+                    {successMessage && (
                     <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
                       {' '}
                       {successMessage}

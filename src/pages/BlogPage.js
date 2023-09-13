@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet-async';
 import { sentenceCase } from 'change-case';
 import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 // @mui
 import {
@@ -34,10 +36,10 @@ import { fDateTime } from '../utils/formatTime';
 
 const TABLE_HEAD = [
   { id: 'application_id', label: 'Application ID', alignRight: false },
-  { id: 'Job ID', label: 'Job ID', alignRight: false },
+  { id: 'job_id', label: 'Job Link', alignRight: false },
   { id: 'date', label: 'Applied Date', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'button', label: 'Button', alignRight: false}
+  { id: 'action', label: 'Action', alignRight: false}
 ];
 
 // ----------------------------------------------------------------------
@@ -46,6 +48,7 @@ export default function UserPage() {
   const cookies = new Cookies();
   const token = cookies.get('token');
   console.log(token);
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
 
   const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
@@ -72,7 +75,7 @@ export default function UserPage() {
       }
     }
     fetchApplications();
-  }, [token]);
+  }, []);
 
   return (
     <>
@@ -95,7 +98,7 @@ export default function UserPage() {
                 <TableBody>
                   {applications.map((application) => {
                     /* eslint-disable camelcase */
-                    const { id, job_id, application_date, status } = application;
+                    const { id, job_id, modified_date, status } = application;
                     /* eslint-disable camelcase */
 
                     return (
@@ -108,10 +111,10 @@ export default function UserPage() {
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{job_id}</TableCell>
+                        <TableCell align="left"><Button onClick={()=>{navigate(`/dashboard/job-posts/${job_id}`)}}>Job {job_id}</Button></TableCell>
 
                         <TableCell align="left">
-                          {fDateTime(application_date)} {/* Make sure to format the date as needed */}
+                          {fDateTime(modified_date)} {/* Make sure to format the date as needed */}
                         </TableCell>
 
                         <TableCell align="left">
@@ -121,7 +124,7 @@ export default function UserPage() {
                         </TableCell>
 
                         <TableCell align="left">
-                          {(status === "In Progress") && <Button size='small' color='info' variant='contained'> 
+                          {(status === "In Progress") && <Button size='small' color='info' variant='contained' onClick={()=>{navigate(`/dashboard/edit-application/${id}`)}}> 
                             Modify Application
                           </Button>}
                         </TableCell>

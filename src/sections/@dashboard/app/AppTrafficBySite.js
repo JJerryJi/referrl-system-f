@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 import { Box, Card, Paper, Typography, CardHeader, CardContent, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Label from '../../../components/label/Label';
 // utils
 
 // import Button from 'src/theme/overrides/Button';
@@ -30,7 +31,7 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
         >
           {list.map((job) => (
             <Paper key={job.job_id} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
-              <Typography variant="h6">{job.job_company}</Typography>
+              <Typography variant="h6">Job {job.job_id } {job.job_company}</Typography>
 
               <Typography variant="body3" sx={{ color: 'text.secondary' }}>
                 {' '}
@@ -38,7 +39,7 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
               </Typography>
               <Box>
                 {' '}
-                <Button sx={{ color: 'text.secondary' }} onClick={()=>{navigate(`/dashboard/job-posts/${job.job_id}`)}}>Learn more about this Job</Button>
+                <Button sx={{ color: '#1565c0' }} onClick={()=>{navigate(`/dashboard/job-posts/${job.job_id}`)}}>Learn more about this Job</Button>
               </Box>
             </Paper>
           ))}
