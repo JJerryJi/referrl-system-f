@@ -10,195 +10,189 @@ import {
   Card,
   Container,
   Typography,
-  FormControl,
-  InputLabel,
-  Input,
   Alert,
+  TableCell,
+  TableBody,
+  TableRow,
+  Stack,
+  TableContainer,
+  Table,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { sentenceCase } from 'change-case';
 
 import Scrollbar from '../components/scrollbar';
+import { fDateTime } from '../utils/formatTime';
 
-export default function DetailedViewApplicationPage(){
-    const {applicationId} = useParams();
-    const navigate = useNavigate();
-    const authToken = new Cookies().get('token');
-    console.log(applicationId);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
-  
-    // Initialize formData state to store form data
-    const [formData, setFormData] = useState({
-      job_id: '',
-      resume_path: null,
-      linkedIn: '',
-      answer: '',
-    });
+export default function DetailedViewApplicationPage() {
+  const { applicationId } = useParams();
+  const navigate = useNavigate();
+  const authToken = new Cookies().get('token');
+  console.log(applicationId);
+  const [application, setApplication] = useState([]);
+  const [applicant, setApplicant] = useState([]);
+  const [applicantUser, setApplicantUser] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
+  useEffect(() => {
+    // get application data
+    fetch(`http://127.0.0.1:8000/application/api/application/${applicationId}`, {
+      headers: {
+        Authorization: authToken,
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data.application);
+        setApplication(data.application);
 
-    useEffect(() => {
-        // Fetch the existing application data and populate the form fields if needed
-        async function fetchApplicationData() {
-          try {
-            const response = await fetch(`http://127.0.0.1:8000/application/api/application/${applicationId}`, {
-                headers: {
-                    Authorization: authToken
-                }
+        if (data.application.student_id) {
+          fetch(`http://127.0.0.1:8000/user/api/student/${data.application.student_id}`)
+            .then((studentResponse) => {
+              return studentResponse.json();
+            })
+            .then((data2) => {
+              if (data2.student.user) setApplicantUser(data2.student.user);
+              setApplicant(data2.student);
             });
-            if (response.ok) {
-              const data = await response.json();
-            //   console.log("Data received from backend:", data);
-    
-              // populate the field with 
-              console.log(data)
-              setFormData(data.application);
-            } else {
-              const data = await response.json();
-              console.log(data);
-              setErrorMessage(data.error);
-              setSuccessMessage('');
-            }
-          }
-          catch(error){console.log(error);
-            }
-
-        }
-    
-        fetchApplicationData();
-      }, [applicationId, authToken]);
-  
-      const handleChange = (e) => {
-        const { name, type } = e.target;
-      
-        if (type === 'file') {
-          const file = e.target.files[0]; // Get the selected file
-          setFormData({
-            ...formData,
-            [name]: file, // Attach the file to the corresponding field in formData
-          });
         } else {
-          // Handle other form fields (e.g., text input, textarea) here
-          const { value } = e.target;
-          setFormData({
-            ...formData,
-            [name]: value,
-          });
+          setErrorMessage('Applicant Student ID is not found!');
         }
-      };
-      
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      // Create a new FormData object and append form data to it
-      const formDataObject = new FormData();
-      formDataObject.append('job_id', formData.job_id);
-      formDataObject.append('resume', formData.resume_path);
-      formDataObject.append('linkedIn', formData.linkedIn);
-      formDataObject.append('answer', formData.answer);
-  
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/application/api/application/${applicationId}`, {
-          method: 'PUT',
-          headers: {
-            Authorization: authToken,
-          },
-          body: formDataObject, // Using FormData for multipart/form-data,
-        });
-  
-        // You can handle the response based on your requirements
-        const data = await response.json();
-        console.log('data:', data);
-  
-        // Optionally, you can navigate or perform other actions here
-        if (data.success===true) {
-          console.log('Application submitted successfully');
-          setSuccessMessage(data.message);
-          setErrorMessage('');
-        } 
-        else{
-          setErrorMessage(data.error);
-          setSuccessMessage('');
-        }
-      } catch (error) {
+      })
+      .catch((error) => {
+        setErrorMessage(error);
         console.log(error);
-        throw new Error(error)
-      }
-    };
-    
+      });
+    // get applicant data
+  }, [authToken]);
 
-    return (      <Container  style={{ maxWidth: "90%" }}>
-    <Typography variant="h4" sx={{ mb: 5 }}>
-      View for Application ID: {applicationId} of 
-    </Typography>
-    <Grid container spacing={2}>
-      <Grid item xs={32} md={16} lg={16}>
-        <Card>
-          <CardHeader title="Application" />
-          <CardContent>
-            <Scrollbar>
-              <form onSubmit={handleSubmit} noValidate>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <Input type="file" name="resume_path" accept=".pdf" onChange={handleChange} required />
-                </FormControl>
+  const applicationArray = Object.entries(application);
+  const applicantArray = Object.entries(applicant);
+  const userArray = Object.entries(applicantUser);
 
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>LinkedIn URL</InputLabel>
-                  <Input type="url" name="linkedIn" value={formData.linkedIn} onChange={handleChange} required />
-                </FormControl>
+  return (
+    <>
+      <Helmet>
+        <title> Referral_Finder </title>
+      </Helmet>
+      <Container maxWidth="xl">
+        <Typography variant="h4" sx={{ mb: 5 }}>
+          Application {applicationId} Detail:
+        </Typography>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={32} md={16} lg={16}>
+            <Card>
+              <CardHeader title="Application Detials" />
+              <CardContent>
+                <Scrollbar>
+                  <TableContainer sx={{ minWidth: 800 }}>
+                    <Table>
+                      <TableBody>
+                        {applicationArray.map(([key, value]) => {
+                          // Exclude specific keys
+                          if (
+                            key === 'student_id' ||
+                            key === 'job_review_status' ||
+                            key === 'job_name' ||
+                            key === 'job_id'
+                          ) {
+                            return null; // Skip rendering this row
+                          }
+                          if (key === 'application_date' || key === 'modified_date') {
+                            value = fDateTime(value);
+                          }
+                          return (
+                            <TableRow hover key={key} tabIndex={-1}>
+                              <TableCell component="th" scope="row" padding="none">
+                                <Stack direction="row" alignItems="center" spacing={2}>
+                                  <Typography variant="subtitle2" noWrap>
+                                    {key !== 'linkedIn' ? sentenceCase(key) : key}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {value}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Scrollbar>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
 
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Answer</InputLabel>
-                  <Input
-                    multiline
-                    rows={4}
-                    name="answer"
-                    value={formData.answer}
-                    onChange={handleChange}
-                    required
-                  />
-                </FormControl>
+        <Grid container spacing={3}>
+          <Grid item xs={32} md={16} lg={16}>
+            <Card>
+              <CardHeader title="Applicant Details" />
+              <CardContent>
+                <Scrollbar>
+                  <TableContainer sx={{ minWidth: 800 }}>
+                    <Table>
+                      <TableBody>
+                        {userArray.map(([key, value]) => {
+                          // Exclude specific keys
+                          if (key === 'id' || key === 'username') {
+                            return null; // Skip rendering this row
+                          }
+                          if (key === 'graduation_year') {
+                            value = fDateTime(value).split(' ').slice(1, -2).join(' ');
+                          }
+                          return (
+                            <TableRow hover key={key} tabIndex={-1}>
+                              <TableCell component="th" scope="row" padding="none">
+                                <Stack direction="row" alignItems="center" spacing={2}>
+                                  <Typography variant="subtitle2" noWrap>
+                                    {key !== 'linkedIn' ? sentenceCase(key) : key}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {value}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
 
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                  <LoadingButton
-                    type="submit"
-                    size="large"
-                    variant="contained"
-                    // You can apply error style here based on your requirements
-                  >
-                    Modify this Application
-                  </LoadingButton>
-                </div>
-              </form>
-
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                <LoadingButton
-                  size="large"
-                  variant="contained"
-                  onClick={() => {
-                    navigate(`/dashboard/application`);
-                  }}
-                >
-                  Back to All Applications
-                </LoadingButton>
-              </div>
-              {errorMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
-                  {' '}
-                  {errorMessage}
-                </Alert>
-              )}
-                {successMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
-                  {' '}
-                  {successMessage}
-                </Alert>
-                
-              )}
-            </Scrollbar>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  </Container>)
+                        {applicantArray.map(([key, value]) => {
+                          // Exclude specific keys
+                          if (key === 'user' || key === 'student_id') {
+                            return null; // Skip rendering this row
+                          }
+                          if (key === 'graduation_year') {
+                            value = fDateTime(value).split(' ').slice(1, -2).join(' ');
+                          }
+                          return (
+                            <TableRow hover key={key} tabIndex={-1}>
+                              <TableCell component="th" scope="row" padding="none">
+                                <Stack direction="row" alignItems="center" spacing={2}>
+                                  <Typography variant="subtitle2" noWrap>
+                                    {key !== 'linkedIn' ? sentenceCase(key) : key}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                                {value}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Scrollbar>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </>
+  );
 }
