@@ -3,7 +3,7 @@ import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
 import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // @mui
 import {
@@ -44,15 +44,13 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function BlogPage({authToken}) {
-  // const cookies = new Cookies();
-  // const token = cookies.get('token');
+export default function DecideApplicationPage({ authToken }) {
   const token = authToken;
   console.log(token);
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('id');
+  const [orderBy, setOrderBy] = useState('job_id');
   const [filterName, setFilterName] = useState('');
 
   function descendingComparator(a, b, orderBy) {
@@ -95,6 +93,7 @@ export default function BlogPage({authToken}) {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+
   let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
@@ -134,7 +133,7 @@ export default function BlogPage({authToken}) {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            My Applications
+            All Applications of my Job Posts
           </Typography>
         </Stack>
 
@@ -156,7 +155,6 @@ export default function BlogPage({authToken}) {
                     // console.log(application);
                     let { id, job_id, modified_date, status } = application;
                     /* eslint-disable  */
-                    id = id + '';
                     return (
                       <TableRow hover key={id} tabIndex={-1}>
                         <TableCell component="th" scope="row" padding="none">
@@ -200,10 +198,10 @@ export default function BlogPage({authToken}) {
                               color="info"
                               variant="contained"
                               onClick={() => {
-                                navigate(`/dashboard/edit-application/${id}`);
+                                navigate(`/dashboard/view-application/${id}`);
                               }}
                             >
-                              Modify Application
+                              View Application
                             </Button>
                           )}
                         </TableCell>

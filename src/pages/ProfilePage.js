@@ -34,8 +34,8 @@ import { fDateTime } from '../utils/formatTime';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'user_info', label: 'User Information', alignRight: false },
-  { id: 'data', label: 'data', alignRight: false },
+  { id: 'fields', label: 'Fields', alignRight: false },
+  { id: 'user_info', label: 'User Profile Data', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -45,45 +45,14 @@ export default function ProfilePage() {
   const token = cookies.get('token');
   const tokenNumber = token?.split(' ')[1];
   const navigate = useNavigate();
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState([]);
   const [error, setErrorMsg] = useState('');
-
-  //   async function fetchProfileInformation() {
-  //     let endpoint = null;
-  //     if(studentID){
-  //       endpoint = `http://127.0.0.1:8000/user/api/student/${studentID}`
-  //     }
-  //     else if(alumniID){
-  //       endpoint = `http://127.0.0.1:8000/user/api/alumni/${alumniID}`
-  //     }
-  //     console.log(endpoint);
-  //     try {
-  //       const response = await fetch(endpoint, {
-  //           method:"GET",
-  //           headers: { Authorization: token}
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error('Network response was not ok');
-  //       }
-
-  //       const data = await response.json();
-  //       console.log(data);
-  //       setProfileData(data);
-
-  //     } catch (error) {
-  //       console.error('Error fetching Profile Information');
-  //     }
-  //   }
 
   useEffect(() => {
     async function fetchProfile() {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/token?token=${tokenNumber}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          method: 'GET'
         });
 
         if (!response.ok) {
@@ -95,7 +64,7 @@ export default function ProfilePage() {
         let studentResponse = null;
         let alumniResponse = null;
         if (data.alumni_id) {
-            alumniResponse = await fetch(`http://127.0.0.1:8000/user/api/alumni/${data.alumni_id}`, {
+          alumniResponse = await fetch(`http://127.0.0.1:8000/user/api/alumni/${data.alumni_id}`, {
             method: 'GET',
             headers: { Authorization: token },
           });
@@ -111,13 +80,12 @@ export default function ProfilePage() {
         if (alumniResponse) {
           const userData = await alumniResponse.json();
           console.log(userData);
-          setProfileData(userData.student);
+          setProfileData(userData.alumni);
         } else if (studentResponse) {
           const userData = await studentResponse.json();
           console.log(userData.student);
           setProfileData(userData.student);
         }
-
       } catch (error) {
         setErrorMsg('Error fetching profile ID');
         console.error('Error fetching profile ID:', error);
@@ -125,6 +93,8 @@ export default function ProfilePage() {
     }
     fetchProfile();
   }, [tokenNumber]);
+
+  const profileDataArray = Object.entries(profileData);
 
   return (
     <>
@@ -143,7 +113,54 @@ export default function ProfilePage() {
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead headLabel={TABLE_HEAD}/> 
+                <UserListHead headLabel={TABLE_HEAD} />
+                <TableBody>
+                  {profileData.user &&
+                    Object.entries(profileData.user).map(([key, value]) => {
+                      // Exclude specific keys
+                      if (key === 'id' || key === 'password') {
+                        return null;
+                      }
+                      return (
+                        <TableRow hover key={key} tabIndex={-1}>
+                          <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Typography variant="subtitle2" noWrap>
+                                {sentenceCase(key)}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {value}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {profileDataArray.map(([key, value]) => {
+                    // Exclude specific keys
+                    if (key === 'user' || key === 'student_id' || key === 'alumni_id') {
+                      return null; // Skip rendering this row
+                    }
+
+                    if (key === 'graduation_year') {
+                      value = fDateTime(value).split(' ').slice(1, -2).join(' ');
+                    }
+                    return (
+                      <TableRow hover key={key} tabIndex={-1}>
+                        <TableCell component="th" scope="row" padding="none">
+                          <Stack direction="row" alignItems="center" spacing={2}>
+                            <Typography variant="subtitle2" noWrap>
+                              {sentenceCase(key)}
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
+                          {value}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
               </Table>
             </TableContainer>
           </Scrollbar>

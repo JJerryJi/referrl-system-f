@@ -119,7 +119,7 @@ export default function DetailedJobPostPage() {
                       navigate(`/dashboard/application`);
                     }}
                   >
-                    Go to Your Applications
+                    Go to Applications
                   </LoadingButton>
                 </div>}
               </CardContent>

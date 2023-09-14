@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import Cookies from 'universal-cookie'
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
@@ -35,7 +36,11 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
+  const cookies = new Cookies();
+  const token = cookies.get('token')?.split(' ')[1];
   const { pathname } = useLocation();
+  const [username, setUsername] = useState('');
+  const [error, setErrorMsg] = useState('');
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -45,6 +50,25 @@ export default function Nav({ openNav, onCloseNav }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/api/token?token=${token}`, {
+      method: 'GET',
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.username) {
+          setUsername(data.username);
+        }
+      })
+      .catch((error) => {
+        setErrorMsg(error);
+        throw new Error(error);
+      });
+  });
 
   const renderContent = (
     <Scrollbar
@@ -64,7 +88,8 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
+                {/* {account.displayName} */}
+                {username}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
