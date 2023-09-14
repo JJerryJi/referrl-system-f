@@ -43,7 +43,7 @@ export default function LoginForm() {
         // Successful login, you can perform any necessary actions here.
         // For example, you can redirect the user to the dashboard.
         const data = await response.json()
-        cookies.set('token', `Token ${data.token}`);
+        cookies.set('token', `Token ${data.token}`, { path: '/'});
         console.log(data.token);
         console.log(cookies.get('token'));
 

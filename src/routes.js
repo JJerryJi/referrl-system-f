@@ -3,7 +3,7 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 //
-import BlogPage from './pages/BlogPage';
+import BlogPage from './pages/ApplicationPage';
 import UserPage from './pages/UserPage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
@@ -14,6 +14,7 @@ import SignupPage from './pages/SignupPage';
 import SubmitApplicationPage from './pages/SubmitApplicationPage'
 import EditApplicationPage from './pages/EditApplicationPage';
 import NewJobPage from './pages/NewJobPage'
+import ProfilePage from './pages/ProfilePage';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -30,6 +31,7 @@ export default function Router() {
         { path: 'new-job-posts', element: <NewJobPage /> },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
+        { path: 'profile', element: <ProfilePage /> },
         { path: 'application', element: <BlogPage /> },
       ],
     },
@@ -51,7 +53,7 @@ export default function Router() {
     },
     {
       path: '*',
-      element: <Navigate to="/404" replace />,
+      element: <Navigate to="/404" />,
     },
   ]);
 

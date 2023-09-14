@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { sentenceCase } from 'change-case';
+import { filter } from 'lodash';
 import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,13 +30,13 @@ import {
 import Label from '../components/label';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead } from '../sections/@dashboard/user';
+import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { fDateTime } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'application_id', label: 'Application ID', alignRight: false },
+  { id: 'id', label: 'Application ID', alignRight: false },
   { id: 'job_id', label: 'Job Link', alignRight: false },
   { id: 'date', label: 'Applied Date', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -44,13 +45,64 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function BlogPage() {
   const cookies = new Cookies();
   const token = cookies.get('token');
   console.log(token);
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('id');
+  const [filterName, setFilterName] = useState('');
 
+
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+  
+  function getComparator(order, orderBy) {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  const handleFilterByName = (event) => {
+    setFilterName(event.target.value);
+  };
+
+
+  function applySortFilter(array, comparator, query) {
+    console.log('app test');
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    if (query) {
+      console.log(array);
+      return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    }
+    return stabilizedThis.map((el) => el[0]);
+  }
+
+
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+    console.log(property);
+  };
+  let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
+
+  const isNotFound = !filteredUsers.length && !!filterName;
   const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
 
   useEffect(() => {
@@ -75,6 +127,8 @@ export default function UserPage() {
       }
     }
     fetchApplications();
+    filteredUsers = applySortFilter(applications, getComparator(order, orderBy), '');
+
   }, []);
 
   return (
@@ -91,16 +145,24 @@ export default function UserPage() {
         </Stack>
 
         <Card>
+        <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead headLabel={TABLE_HEAD} />
+                <UserListHead 
+                                  order={order}
+                                  orderBy={orderBy}
+                                  headLabel={TABLE_HEAD}
+                                  rowCount={applications?.length}
+                                  onRequestSort={handleRequestSort}
+                                   />
                 <TableBody>
-                  {applications.map((application) => {
-                    /* eslint-disable camelcase */
-                    const { id, job_id, modified_date, status } = application;
-                    /* eslint-disable camelcase */
-
+                  {filteredUsers.map((application) => {
+                    /* eslint-disable  */
+                    console.log(application);
+                    let { id, job_id, modified_date, status } = application;
+                    /* eslint-disable  */
+                    id = id + '';
                     return (
                       <TableRow hover key={id} tabIndex={-1}>
                         <TableCell component="th" scope="row" padding="none" >
@@ -132,6 +194,31 @@ export default function UserPage() {
                     );
                   })}
                 </TableBody>
+
+                {isNotFound && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            Not found
+                          </Typography>
+
+                          <Typography variant="body2">
+                            No results found for &nbsp;
+                            <strong>&quot;{filterName}&quot;</strong>.
+                            <br /> Try checking for typos or using complete words.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
+
               </Table>
             </TableContainer>
           </Scrollbar>

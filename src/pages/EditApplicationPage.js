@@ -54,7 +54,9 @@ export default function EditApplicationPage(){
               setFormData(data.application);
             } else {
               const data = await response.json();
-              console.log(data)
+              console.log(data);
+              setErrorMessage(data.error);
+              setSuccessMessage('');
             }
           }
           catch(error){console.log(error);
@@ -111,15 +113,16 @@ export default function EditApplicationPage(){
         // Optionally, you can navigate or perform other actions here
         if (data.success===true) {
           console.log('Application submitted successfully');
+          setSuccessMessage(data.message);
+          setErrorMessage('');
         } 
         else{
           setErrorMessage(data.error);
+          setSuccessMessage('');
         }
       } catch (error) {
-        const err = await error.json();
-        console.log(err.error);
-        setErrorMessage(err.message);
-        console.error('Error:', err);
+        console.log(error);
+        throw new Error(error)
       }
     };
     
@@ -179,13 +182,13 @@ export default function EditApplicationPage(){
                   Back to All Applications
                 </LoadingButton>
               </div>
-              {errorMessage && !successMessage && (
+              {errorMessage && (
                 <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
                   {' '}
                   {errorMessage}
                 </Alert>
               )}
-                {successMessage && !errorMessage (
+                {successMessage && (
                 <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
                   {' '}
                   {successMessage}

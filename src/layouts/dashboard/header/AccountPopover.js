@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -16,23 +19,63 @@ const MENU_OPTIONS = [
     label: 'Profile',
     icon: 'eva:person-fill',
   },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-  },
 ];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const cookies = new Cookies();
+  const token = cookies.get('token')?.split(' ')[1];
+
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    fetch(`http://127.0.0.1:8000/api/token?token=${token}`, {
+      method: 'GET',
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.email) {
+          setEmail(data.email);
+        }
+        if (data.username) {
+          setUsername(data.username);
+        }
+        // console.log(data);
+        // console.log(username);
+        // console.log(email);
+      })
+      .catch((error) => {
+        setErrorMsg(error);
+        throw new Error(error);
+      });
+  });
+
+  // fetch user email
+  const navigate = useNavigate();
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
+    console.log(open);
   };
 
-  const handleClose = () => {
+  const handleClose = ()=>{
     setOpen(null);
+  };
+
+  const handleCloseProfile = () => {
+    setOpen(null);
+    navigate('/dashboard/profile')
+  };
+
+  const hanldeCloseHome = () => {
+    setOpen(null);
+    navigate('/dashboard/job-posts');
   };
 
   return (
@@ -77,27 +120,47 @@ export default function AccountPopover() {
         }}
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
-          <Typography variant="subtitle2" noWrap>
-            {account.displayName}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
-          </Typography>
+          {username === '' ? (
+            <>
+              <Typography variant="subtitle2" noWrap color="error">
+                Unauthorized user
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                Please sign in now
+              </Typography>
+            </>
+          ) : (
+            <>
+              <Typography variant="subtitle2" noWrap>
+                {username}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                {email}
+              </Typography>
+            </>
+          )}
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Stack sx={{ p: 1 }}>
-          {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
-            </MenuItem>
-          ))}
+          <MenuItem key={MENU_OPTIONS[0].label} onClick={hanldeCloseHome}>{MENU_OPTIONS[0].label}</MenuItem>
+          <MenuItem key={MENU_OPTIONS[1].label} onClick={handleCloseProfile}>{MENU_OPTIONS[1].label}</MenuItem>
+
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        {/* Logout logic: */}
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            navigate('/login');
+            cookies.remove('token', { path: '/' });
+            // console.log(cookies.get('token'));
+          }}
+          sx={{ m: 1 }}
+        >
           Logout
         </MenuItem>
       </Popover>
