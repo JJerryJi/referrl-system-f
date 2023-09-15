@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
 
 import {
@@ -18,12 +18,16 @@ import {
 import { LoadingButton } from '@mui/lab';
 
 import Scrollbar from '../components/scrollbar';
+import { validateJobPostForm } from '../utils/validateForms';
 
-export default function NewJobPage() {
+
+export default function EditJobPostPage() {
+  const { jobId } = useParams();
   const navigate = useNavigate();
   const authToken = new Cookies().get('token');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const jobPostEndpoint = `http://127.0.0.1:8000/job/api/posts/${jobId}`;
 
   // Initialize formData state to store form data
   const [formData, setFormData] = useState({
@@ -34,49 +38,65 @@ export default function NewJobPage() {
     job_description: '',
   });
 
+  useEffect(() => {
+    async function fetchJobPosts() {
+      try {
+        const response = await fetch(jobPostEndpoint, {
+          headers: { Authorization: authToken },
+        });
+        const data = await response.json();
+        setFormData(data?.job_post)
+        console.log(data.job_post)
+      } catch (error) {
+        console.log('Error fetching job posts:', error);
+        throw error;
+      }
+    }
+    fetchJobPosts();
+  }, [authToken]);
   // validate the form
-  const validateForm = () => {
-    const errors = {};
+//   const validateJobPostForm = (formData) => {
+//     const errors = {};
 
-    // Validate job_name (example: should not be empty)
-    if (!formData.job_name.trim()) {
-      errors.job_name = 'Job Name is required';
-    }
+//     // Validate job_name (example: should not be empty)
+//     if (!formData.job_name.trim()) {
+//       errors.job_name = 'Job Name is required';
+//     }
 
-    // Validate job_company (example: should not be empty)
-    if (!formData.job_company.trim()) {
-      errors.job_company = 'Company Name is required';
-    }
+//     // Validate job_company (example: should not be empty)
+//     if (!formData.job_company.trim()) {
+//       errors.job_company = 'Company Name is required';
+//     }
 
-    // Validate job_requirement (example: should not be empty)
-    if (!formData.job_requirement.trim()) {
-      errors.job_requirement = 'Job Requirement is required';
-    }
+//     // Validate job_requirement (example: should not be empty)
+//     if (!formData.job_requirement.trim()) {
+//       errors.job_requirement = 'Job Requirement is required';
+//     }
 
-    // Validate question (example: should not be empty)
-    if (!formData.job_question.trim()) {
-      errors.job_question = 'Job Question is required';
-    }
+//     // Validate question (example: should not be empty)
+//     if (!formData.job_question.trim()) {
+//       errors.job_question = 'Job Question is required';
+//     }
 
-    // Validate job_description (example: should not be empty)
-    if (!formData.job_description.trim()) {
-      errors.job_description = 'Job Description is required';
-    }
+//     // Validate job_description (example: should not be empty)
+//     if (!formData.job_description.trim()) {
+//       errors.job_description = 'Job Description is required';
+//     }
 
-    return errors;
-  };
+//     return errors;
+//   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate the form fields
-    const errors = validateForm();
+    const errors = validateJobPostForm(formData);
 
     if (Object.keys(errors).length === 0) {
       // No validation errors, proceed with form submission
       try {
-        const response = await fetch('http://127.0.0.1:8000/job/api/posts', {
-          method: 'POST',
+        const response = await fetch(jobPostEndpoint, {
+          method: 'PUT',
           headers: {
             Authorization: authToken,
             'Content-Type': 'application/json', // Specify JSON content type
@@ -87,8 +107,8 @@ export default function NewJobPage() {
         const data = await response.json();
 
         if (data.success === true) {
-          console.log('Application submitted successfully');
-          setSuccessMessage('Application submitted successfully');
+          console.log('Job Post Updates submitted successfully');
+          setSuccessMessage(data.message);
           setErrorMessage('');
           // navigate(`/dashboard/job-posts/${jobId}`);
         } else {
@@ -122,7 +142,7 @@ export default function NewJobPage() {
       </Helmet>
       <Container style={{ maxWidth: '90%' }}>
         <Typography variant="h4" sx={{ mb: 5 }}>
-          New Job Post
+          Edit my Job Post
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={32} md={16} lg={16}>

@@ -35,7 +35,7 @@ import { fDateTime } from '../utils/formatTime';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'job_id', label: 'Job ID', alignRight: false },
+  { id: 'job_id', label: 'Job Link', alignRight: false },
   { id: 'job_company', label: 'Job Company', alignRight: false },
   { id: 'job_open_status', label: 'Job Status', alignRight: false },
   { id: 'job_review_status', label: 'Review Status', alignRight: false },
@@ -233,11 +233,11 @@ export default function MyJobPosts({ authToken }) {
                             color="info"
                             variant="contained"
                             onClick={() => {
-                              navigate(`/dashboard/job-posts/${job_id}`);
+                              navigate(`/dashboard/edit-job-posts/${job_id}`);
                             }}
                             disabled={job_review_status === 'In-review'}
                           >
-                            View Job Post
+                            Modify Job Post
                           </Button>
                         </TableCell>
                       </TableRow>
