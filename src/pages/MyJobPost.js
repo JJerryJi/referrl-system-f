@@ -49,11 +49,17 @@ const TABLE_HEAD = [
 export default function MyJobPosts({ authToken }) {
   const token = authToken;
   console.log(token);
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
+
+  // multiple page design
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const [jobPosts, setJobPosts] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('job_id');
   const [filterName, setFilterName] = useState('');
+  
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -96,9 +102,18 @@ export default function MyJobPosts({ authToken }) {
     setOrderBy(property);
   };
 
-  let filteredUsers = applySortFilter(jobPosts, getComparator(order, orderBy), filterName);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const handleChangeRowsPerPage = (event) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
+  let filteredJobPosts = applySortFilter(jobPosts, getComparator(order, orderBy), filterName);
+
+  const isNotFound = !filteredJobPosts.length && !!filterName;
   const jobPostsEndpoint = `http://127.0.0.1:8000/job/api/my_posts`;
 
   useEffect(() => {
@@ -123,7 +138,7 @@ export default function MyJobPosts({ authToken }) {
       }
     }
     fetchApplications();
-    filteredUsers = applySortFilter(jobPosts, getComparator(order, orderBy), '');
+    filteredJobPosts = applySortFilter(jobPosts, getComparator(order, orderBy), '');
   }, []);
 
   return (
@@ -152,7 +167,7 @@ export default function MyJobPosts({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.map((jobPost) => {
+                  {filteredJobPosts.slice(rowsPerPage * page, rowsPerPage * page + rowsPerPage).map((jobPost) => {
                     /* eslint-disable  */
                     // console.log(application);
                     let { job_id, job_company, job_open_status, job_review_status, num_of_applicants } = jobPost;
@@ -256,6 +271,17 @@ export default function MyJobPosts({ authToken }) {
               </Table>
             </TableContainer>
           </Scrollbar>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={jobPosts?.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+
         </Card>
       </Container>
     </>

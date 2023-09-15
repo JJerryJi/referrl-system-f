@@ -44,12 +44,17 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function BlogPage({authToken}) {
+export default function BlogPage({ authToken }) {
   // const cookies = new Cookies();
   // const token = cookies.get('token');
   const token = authToken;
   console.log(token);
   const navigate = useNavigate();
+
+  // multiple page design
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const [applications, setApplications] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('id');
@@ -75,6 +80,15 @@ export default function BlogPage({authToken}) {
     setFilterName(event.target.value);
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
   function applySortFilter(array, comparator, query) {
     // console.log('app test');
     const stabilizedThis = array.map((el, index) => [el, index]);
@@ -98,6 +112,7 @@ export default function BlogPage({authToken}) {
   let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - applications.length) : 0;
   const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
 
   useEffect(() => {
@@ -151,12 +166,11 @@ export default function BlogPage({authToken}) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.map((application) => {
+                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
                     /* eslint-disable  */
                     // console.log(application);
                     let { id, job_id, modified_date, status } = application;
                     /* eslint-disable  */
-                    id = id + '';
                     return (
                       <TableRow hover key={id} tabIndex={-1}>
                         <TableCell component="th" scope="row" padding="none">
@@ -210,6 +224,11 @@ export default function BlogPage({authToken}) {
                       </TableRow>
                     );
                   })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: 53 * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
                 </TableBody>
 
                 {isNotFound && (
@@ -238,6 +257,16 @@ export default function BlogPage({authToken}) {
               </Table>
             </TableContainer>
           </Scrollbar>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={applications?.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </Card>
       </Container>
     </>

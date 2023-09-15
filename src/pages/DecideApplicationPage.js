@@ -48,6 +48,10 @@ export default function DecideApplicationPage({ authToken }) {
   const token = authToken;
   console.log(token);
   const navigate = useNavigate();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const [applications, setApplications] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('job_id');
@@ -92,6 +96,15 @@ export default function DecideApplicationPage({ authToken }) {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
@@ -150,7 +163,7 @@ export default function DecideApplicationPage({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.map((application) => {
+                  {filteredUsers.slice(rowsPerPage * page, rowsPerPage * page + rowsPerPage).map((application) => {
                     /* eslint-disable  */
                     // console.log(application);
                     let { id, job_id, modified_date, status } = application;
@@ -234,6 +247,15 @@ export default function DecideApplicationPage({ authToken }) {
               </Table>
             </TableContainer>
           </Scrollbar>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={applications?.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </Card>
       </Container>
     </>
