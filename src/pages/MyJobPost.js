@@ -35,20 +35,22 @@ import { fDateTime } from '../utils/formatTime';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'Application ID', alignRight: false },
-  { id: 'job_id', label: 'Job Link', alignRight: false },
-  { id: 'date', label: 'Applied Date', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'action', label: 'Action', alignRight: false },
+  { id: 'job_id', label: 'Job ID', alignRight: false },
+  { id: 'job_company', label: 'Job Company', alignRight: false },
+  { id: 'job_open_status', label: 'Job Status', alignRight: false },
+  { id: 'job_review_status', label: 'Review Status', alignRight: false },
+  { id: 'num_of_applicants', label: 'Num of Applicants', alignRight: false },
+  { id: 'detail_view', label: 'Action', alignRight: false },
+
 ];
 
 // ----------------------------------------------------------------------
 
-export default function DecideApplicationPage({ authToken }) {
+export default function MyJobPosts({ authToken }) {
   const token = authToken;
   console.log(token);
   const navigate = useNavigate();
-  const [applications, setApplications] = useState([]);
+  const [jobPosts, setJobPosts] = useState([]);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('job_id');
   const [filterName, setFilterName] = useState('');
@@ -94,16 +96,16 @@ export default function DecideApplicationPage({ authToken }) {
     setOrderBy(property);
   };
 
-  let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
+  let filteredUsers = applySortFilter(jobPosts, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
-  const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
+  const jobPostsEndpoint = `http://127.0.0.1:8000/job/api/my_posts`;
 
   useEffect(() => {
     // Fetch applications with authorization header
     async function fetchApplications() {
       try {
-        const response = await fetch(ApplicationEndpoint, {
+        const response = await fetch(jobPostsEndpoint, {
           headers: {
             Authorization: token,
           },
@@ -114,14 +116,14 @@ export default function DecideApplicationPage({ authToken }) {
         }
 
         const data = await response.json();
-        setApplications(data.application);
-        console.log(data.application);
+        setJobPosts(data.job_post);
+        console.log(data.job_post);
       } catch (error) {
         console.error('Error fetching applications:', error);
       }
     }
     fetchApplications();
-    filteredUsers = applySortFilter(applications, getComparator(order, orderBy), '');
+    filteredUsers = applySortFilter(jobPosts, getComparator(order, orderBy), '');
   }, []);
 
   return (
@@ -133,7 +135,7 @@ export default function DecideApplicationPage({ authToken }) {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            All Applications of my Job Posts
+            My job Posts
           </Typography>
         </Stack>
 
@@ -146,24 +148,17 @@ export default function DecideApplicationPage({ authToken }) {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={applications?.length}
+                  rowCount={jobPosts?.length}
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.map((application) => {
+                  {filteredUsers.map((jobPost) => {
                     /* eslint-disable  */
                     // console.log(application);
-                    let { id, job_id, modified_date, status } = application;
+                    let { job_id, job_company, job_open_status, job_review_status, num_of_applicants } = jobPost;
                     /* eslint-disable  */
                     return (
-                      <TableRow hover key={id} tabIndex={-1}>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: '25%' }}>
-                            <Typography variant="subtitle2" noWrap>
-                              {id}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                      <TableRow hover key={job_id} tabIndex={-1}>
 
                         <TableCell align="left">
                           <Button
@@ -175,20 +170,46 @@ export default function DecideApplicationPage({ authToken }) {
                           </Button>
                         </TableCell>
 
-                        <TableCell align="left">
-                          {fDateTime(modified_date)} {/* Make sure to format the date as needed */}
+                        <TableCell component="th" scope="row" padding="none">
+                          <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: '25%' }}>
+                            <Typography variant="subtitle2" noWrap>
+                              {job_company}
+                            </Typography>
+                          </Stack>
                         </TableCell>
+
 
                         <TableCell align="left">
                           <Label
                             color={
-                              (status === 'In Progress' && 'info') ||
-                              (status === 'Not-moving-forward' && 'error') ||
+                              (job_open_status === 'accept' && 'info') ||
+                              (job_open_status === 'closed' && 'error') ||
                               'success'
                             }
                           >
-                            {sentenceCase(status)}
+                            {job_open_status}
                           </Label>
+                        </TableCell>
+
+
+                        <TableCell align="left">
+                          <Label
+                            color={
+                              (job_review_status === 'In-review' && 'info') ||
+                              (job_review_status === 'Fail' && 'error') ||
+                              'success'
+                            }
+                          >
+                            {job_review_status}
+                          </Label>
+                        </TableCell>
+
+                        <TableCell component="th" scope="row" padding="none">
+                          <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: '25%' }}>
+                            <Typography variant="subtitle2" noWrap>
+                              {num_of_applicants}
+                            </Typography>
+                          </Stack>
                         </TableCell>
 
                         <TableCell align="left">
@@ -197,10 +218,11 @@ export default function DecideApplicationPage({ authToken }) {
                             color="info"
                             variant="contained"
                             onClick={() => {
-                              navigate(`/dashboard/view-application/${id}`);
+                              navigate(`/dashboard/job-posts/${job_id}`);
                             }}
+                            disabled={job_review_status === 'In-review'}
                           >
-                            View Application
+                            View Job Post
                           </Button>
                         </TableCell>
                       </TableRow>

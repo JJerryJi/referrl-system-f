@@ -123,7 +123,7 @@ export default function ProfilePage() {
                       }
                       return (
                         <TableRow hover key={key} tabIndex={-1}>
-                          <TableCell component="th" scope="row" padding="none">
+                          <TableCell component="th" scope="row" sx={{paddingLeft:2}}>
                             <Stack direction="row" alignItems="center" spacing={2}>
                               <Typography variant="subtitle2" noWrap>
                                 {sentenceCase(key)}
@@ -138,7 +138,7 @@ export default function ProfilePage() {
                     })}
                   {profileDataArray.map(([key, value]) => {
                     // Exclude specific keys
-                    if (key === 'user' || key === 'student_id' || key === 'alumni_id') {
+                    if (key === 'user' || key === 'student_id' || key === 'alumni_id' || key === 'modified_time'  ) {
                       return null; // Skip rendering this row
                     }
 
@@ -147,7 +147,7 @@ export default function ProfilePage() {
                     }
                     return (
                       <TableRow hover key={key} tabIndex={-1}>
-                        <TableCell component="th" scope="row" padding="none">
+                        <TableCell component="th" scope="row" sx={{paddingLeft:2}} >
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
                               {sentenceCase(key)}

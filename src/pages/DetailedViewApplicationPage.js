@@ -27,6 +27,7 @@ import { fDateTime } from '../utils/formatTime';
 export default function DetailedViewApplicationPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
+  const [status, setStatus] = useState('');
   const authToken = new Cookies().get('token');
   console.log(applicationId);
   const [application, setApplication] = useState([]);
@@ -73,6 +74,50 @@ export default function DetailedViewApplicationPage() {
   const applicantArray = Object.entries(applicant);
   const userArray = Object.entries(applicantUser);
 
+  // Handler for the "Select this Application" button
+  const handleSelectApplication = (status) => {
+    const headers = {
+      Authorization: authToken, // Add your authorization token here
+      'Content-Type': 'application/json',
+    };
+    // Send the PUT request to update the application status
+    fetch(`http://127.0.0.1:8000/application/api/application/${applicationId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: authToken, // Add your authorization token here
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({"status": status}),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to update application status');
+        }        
+        return response.json();
+      }).then((data)=>{
+        if(data.success === false)
+        {setSuccessMessage(data.message);
+        setErrorMessage('');}
+        else{
+            setErrorMessage(data.error);
+            setSuccessMessage('');
+        }
+      })
+      .catch((error) => {
+        // Handle errors, e.g., show an error message to the user
+        setErrorMessage(error.message);
+        setSuccessMessage('');
+      });
+  };
+
+  const handleSelection = () => {
+    handleSelectApplication('Selected');
+  };
+
+  const handleReject = () => {
+    handleSelectApplication('Not-moving-forward');
+  };
+
   return (
     <>
       <Helmet>
@@ -80,12 +125,12 @@ export default function DetailedViewApplicationPage() {
       </Helmet>
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Application {applicationId} Detail:
+          Application {applicationId}:
         </Typography>
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={32} md={16} lg={16}>
             <Card>
-              <CardHeader title="Application Detials" />
+              <CardHeader title="Application Details" />
               <CardContent>
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
@@ -188,6 +233,44 @@ export default function DetailedViewApplicationPage() {
                     </Table>
                   </TableContainer>
                 </Scrollbar>
+
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                  <LoadingButton
+                    size="large"
+                    variant={status === 'Pass' ? 'contained' : 'outlined'}
+                    color="success"
+                    value="success"
+                    onClick={handleSelection}
+                  >
+                    Select this Application
+                  </LoadingButton>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                  <LoadingButton
+                    size="large"
+                    variant={status === 'Fail' ? 'contained' : 'outlined'}
+                    color="error"
+                    value="Fail"
+                    onClick={handleReject}
+                  >
+                    Fail this Application
+                  </LoadingButton>
+                </div>
+
+                {errorMessage && (
+                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
+                  {' '}
+                  {errorMessage}
+                </Alert>
+              )}
+                {successMessage && (
+                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
+                  {' '}
+                  {successMessage}
+                </Alert>
+                
+              )}
               </CardContent>
             </Card>
           </Grid>

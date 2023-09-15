@@ -19,6 +19,7 @@ import NewJobPage from './pages/NewJobPage'
 import ProfilePage from './pages/ProfilePage';
 import DecideApplicationPage from './pages/DecideApplicationPage';
 import DetailedViewApplicationPage from './pages/DetailedViewApplicationPage'
+import MyJobPosts from './pages/MyJobPost';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -63,6 +64,7 @@ export default function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'profile', element: <ProfilePage /> },
         { path: 'application', element: (role === 'student' ? <BlogPage authToken={authToken}/> : <DecideApplicationPage authToken={authToken}/>) },
+        { path: 'my-job-posts', element: (role === 'alumni' ? <MyJobPosts authToken={authToken}/> : <Page404/>) },
       ],
     },
     {

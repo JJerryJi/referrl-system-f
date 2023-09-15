@@ -31,6 +31,7 @@ export default function DetailedJobPostPage() {
   const jobId = useParams().jobId;
   console.log(authToken);
 
+  // prepare fetch to see if have applied
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/job/api/posts/${jobId}`, {
       headers: {
