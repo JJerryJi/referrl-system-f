@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
-import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +26,7 @@ import {
 } from '@mui/material';
 // components
 import Label from '../components/label';
+import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
@@ -37,9 +37,7 @@ const TABLE_HEAD = [
   { id: 'job_id', label: 'Favorite Job Link', alignRight: false },
   { id: 'application_link', label: 'Application Link', alignRight: false },
   { id: 'application_status', label: 'Status', alignRight: false },
-  //   { id: 'student_id', label: ' Date', alignRight: false },
-  //   { id: 'status', label: 'Status', alignRight: false },
-  //   { id: 'action', label: 'Action', alignRight: false },
+  { id: '' },
 ];
 
 // ----------------------------------------------------------------------
@@ -51,6 +49,9 @@ export default function FavoriteJobPostPage({ authToken }) {
   console.log(token);
   const navigate = useNavigate();
 
+  const [open, setOpen] = useState(null);
+  const [selectedFavoriteJobId, setSelectedFavoriteJobId] = useState(null);
+
   // multiple page design
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -60,6 +61,17 @@ export default function FavoriteJobPostPage({ authToken }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('job_id');
   const [filterName, setFilterName] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleOpenMenu = (event, favoriteJobId) => {
+    setOpen(event.currentTarget);
+    setSelectedFavoriteJobId(favoriteJobId);
+    console.log(favoriteJobId);
+  };
+
+  const handleCloseMenu = () => {
+    setOpen(null);
+  };
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -115,6 +127,27 @@ export default function FavoriteJobPostPage({ authToken }) {
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - favoriteJobs.length) : 0;
   const favoriteJobsEndpoint = `http://127.0.0.1:8000/job/api/favorite_jobs`;
 
+  const handleDeleteFavJob = () => {
+    console.log('success');
+    fetch(favoriteJobsEndpoint.concat('/').concat(selectedFavoriteJobId), {
+      method: 'DELETE',
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if(data.success){
+          setSuccessMessage(data.message);
+          setOpen(null);
+        }
+        console.log(data);
+      })
+      .catch((error) => console.log(error));
+  };
+
   useEffect(() => {
     // Fetch favorite jobs with authorization header
     async function fetchFavoriteJobs() {
@@ -163,7 +196,7 @@ export default function FavoriteJobPostPage({ authToken }) {
     }
     fetchFavoriteJobs();
     filteredUsers = applySortFilter(favoriteJobs, getComparator(order, orderBy), '');
-  }, []);
+  }, [successMessage]);
 
   return (
     <>
@@ -195,8 +228,9 @@ export default function FavoriteJobPostPage({ authToken }) {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((application, index) => {
                       /* eslint-disable  */
-                      // console.log(application);
-                      let { job_id, job_open_status } = application;
+                      // id: favorite job id
+                      // job_id: current job id
+                      let { id, job_id, job_open_status } = application;
                       let isJobApplied = appliedInfo[index];
                       let currentJobStatus = appliedJobStatus[index];
                       /* eslint-disable  */
@@ -238,6 +272,16 @@ export default function FavoriteJobPostPage({ authToken }) {
                               {currentJobStatus || 'Not Available'}
                             </Label>
                           </TableCell>
+
+                          <TableCell align="right">
+                            <IconButton
+                              size="large"
+                              color="inherit"
+                              onClick={(clickEvent) => handleOpenMenu(clickEvent, id)}
+                            >
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -275,6 +319,7 @@ export default function FavoriteJobPostPage({ authToken }) {
             </TableContainer>
           </Scrollbar>
 
+
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
@@ -284,6 +329,19 @@ export default function FavoriteJobPostPage({ authToken }) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
+
+          <Popover
+            open={Boolean(open)}
+            anchorEl={open}
+            onClose={handleCloseMenu}
+            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <MenuItem sx={{ color: 'error.main' }} onClick={handleDeleteFavJob}>
+              <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+              Delete
+            </MenuItem>
+          </Popover>
         </Card>
       </Container>
     </>
