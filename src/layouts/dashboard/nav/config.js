@@ -31,6 +31,11 @@ const navConfig = [
     path: '/dashboard/application',
     icon: icon('ic_blog'),
   },
+    {
+    title: 'Saved Job Posts',
+    path: '/dashboard/favorite-job-posts',
+    icon: icon('ic_cart'),
+  },
   {
     title: 'profile',
     path: '/dashboard/Profile',

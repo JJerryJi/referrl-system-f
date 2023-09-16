@@ -21,6 +21,7 @@ import DecideApplicationPage from './pages/DecideApplicationPage';
 import DetailedViewApplicationPage from './pages/DetailedViewApplicationPage'
 import MyJobPosts from './pages/MyJobPost';
 import EditJobPostPage from './pages/EditJobPostPage'
+import FavoriteJobPostPage from './pages/FavoriteJobPostPage';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -57,6 +58,7 @@ export default function Router() {
         { element: <Navigate to="/dashboard/job-posts" />, index: true },
         { path: 'job-posts', element: <DashboardAppPage /> },
         { path: 'job-posts/:jobId', element: <DetailedJobPostPage />},
+        { path: 'edit-job-posts/:jobId', element: <EditJobPostPage />},
         { path: 'application/:jobId', element: <SubmitApplicationPage />},
         { path: 'edit-application/:applicationId', element: <EditApplicationPage />},
         { path: 'view-application/:applicationId', element: <DetailedViewApplicationPage/>},
@@ -66,7 +68,7 @@ export default function Router() {
         { path: 'profile', element: <ProfilePage /> },
         { path: 'application', element: (role === 'student' ? <BlogPage authToken={authToken}/> : <DecideApplicationPage authToken={authToken}/>) },
         { path: 'my-job-posts', element: (role === 'alumni' ? <MyJobPosts authToken={authToken}/> : <Page404/>) },
-        { path: 'edit-job-posts/:jobId', element: <EditJobPostPage />}
+        { path: 'favorite-job-posts', element: (role === 'student' ? <FavoriteJobPostPage authToken={authToken}/> : <Page404/>) },
       ],
     },
     {
