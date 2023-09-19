@@ -150,7 +150,7 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> User | Referral Finder </title>
       </Helmet>
 
       <Container>

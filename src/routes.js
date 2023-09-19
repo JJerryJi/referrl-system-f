@@ -57,7 +57,7 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/job-posts" />, index: true },
         { path: 'job-posts', element: <DashboardAppPage /> },
-        { path: 'job-posts/:jobId', element: <DetailedJobPostPage />},
+        { path: 'job-posts/:jobId', element: <DetailedJobPostPage role={role}/>},
         { path: 'edit-job-posts/:jobId', element: <EditJobPostPage />},
         { path: 'application/:jobId', element: <SubmitApplicationPage />},
         { path: 'edit-application/:applicationId', element: <EditApplicationPage />},

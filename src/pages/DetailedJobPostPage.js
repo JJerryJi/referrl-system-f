@@ -5,6 +5,7 @@ import { sentenceCase } from 'change-case';
 import Cookies from 'universal-cookie';
 
 import {
+  Alert,
   CardHeader,
   CardContent,
   Grid,
@@ -22,17 +23,20 @@ import { LoadingButton } from '@mui/lab';
 
 import Scrollbar from '../components/scrollbar';
 
-export default function DetailedJobPostPage() {
+export default function DetailedJobPostPage({role}) {
   const navigate = useNavigate();
+  const jobId = useParams().jobId;
+  const student = role === 'student';
+  console.log(student);
   const authToken = new Cookies().get('token');
   const [jobPost, setJobPost] = useState({});
   const [errMsg, setErrMsg] = useState();
   const [applied, setApplied] = useState('');
-  const jobId = useParams().jobId;
+  const [favoriteJob, setFavoriteJob] = useState(null);
   console.log(authToken);
 
-  // prepare fetch to see if have applied
   useEffect(() => {
+    // fetch job post info & if_applied
     fetch(`http://127.0.0.1:8000/job/api/posts/${jobId}`, {
       headers: {
         Authorization: authToken,
@@ -42,21 +46,42 @@ export default function DetailedJobPostPage() {
       .then((data) => {
         console.log(data);
         setApplied(data.has_student_applied_before);
-        console.log(applied)
+        console.log(applied);
         setJobPost(data.job_post);
       })
       .catch((error) => {
         setErrMsg(error);
         console.log(error);
       });
-  }, [authToken, jobId]);
+      
+  }, []);
 
+  const hanldeFavoriteJob = () => {
+    fetch(`http://127.0.0.1:8000/job/api/favorite_jobs`, {
+      method: 'POST',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"job_id": jobId})
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if(data.success===false){setErrMsg(data.error)}
+        setFavoriteJob(true);
+      })
+      .catch((error) => {
+        setErrMsg(error);
+        console.log(error);
+      });
+  };
   const jobPostArray = Object.entries(jobPost);
 
   return (
     <>
       <Helmet>
-        <title>Dashboard | Minimal UI</title>
+        <title>Dashboard | Referral Finder</title>
       </Helmet>
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
@@ -99,7 +124,19 @@ export default function DetailedJobPostPage() {
                     </Table>
                   </TableContainer>
                 </Scrollbar>
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+
+                {student && (<div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                   <LoadingButton
+                    size="large"
+                    variant="contained"
+                    onClick={hanldeFavoriteJob}
+                  >
+                    Add to Favorites
+                  </LoadingButton>
+                </div>)}
+
+
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
                    <LoadingButton
                     size="large"
                     variant="contained"
@@ -123,6 +160,13 @@ export default function DetailedJobPostPage() {
                     Go to Applications
                   </LoadingButton>
                 </div>}
+
+                {errMsg && (
+                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
+                  {' '}
+                  {errMsg}
+                </Alert>
+              )}
               </CardContent>
             </Card>
           </Grid>

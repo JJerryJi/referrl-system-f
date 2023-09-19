@@ -44,7 +44,7 @@ export default function SignupPage() {
   return (
     <>
       <Helmet>
-        <title> Login | Minimal UI </title>
+        <title> Login | Referral Finder </title>
       </Helmet>
 
       <StyledRoot>
