@@ -87,20 +87,21 @@ export default function DetailedViewApplicationPage() {
         Authorization: authToken, // Add your authorization token here
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({"status": status}),
+      body: JSON.stringify({"status": status }),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to update application status');
-        }        
+        }
         return response.json();
-      }).then((data)=>{
-        if(data.success === false)
-        {setSuccessMessage(data.message);
-        setErrorMessage('');}
-        else{
-            setErrorMessage(data.error);
-            setSuccessMessage('');
+      })
+      .then((data) => {
+        if (data.success === false) {
+          setSuccessMessage(data.message);
+          setErrorMessage('');
+        } else {
+          setErrorMessage(data.error);
+          setSuccessMessage('');
         }
       })
       .catch((error) => {
@@ -149,6 +150,7 @@ export default function DetailedViewApplicationPage() {
                           if (key === 'application_date' || key === 'modified_date') {
                             value = fDateTime(value);
                           }
+
                           return (
                             <TableRow hover key={key} tabIndex={-1}>
                               <TableCell component="th" scope="row" padding="none">
@@ -159,7 +161,13 @@ export default function DetailedViewApplicationPage() {
                                 </Stack>
                               </TableCell>
                               <TableCell align="left" sx={{ whiteSpace: 'pre-wrap' }}>
-                                {value}
+                                {key === 'resume_path' ? (
+                                  <a href={`http://127.0.0.1:8000/${value}`} target="_blank" rel="noopener noreferrer">
+                                    Preview Resume
+                                  </a>
+                                ) : (
+                                  value
+                                )}
                               </TableCell>
                             </TableRow>
                           );
@@ -259,18 +267,14 @@ export default function DetailedViewApplicationPage() {
                 </div>
 
                 {errorMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
-                  {' '}
-                  {errorMessage}
-                </Alert>
-              )}
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
+                    {' '}
+                    {errorMessage}
+                  </Alert>
+                )}
                 {successMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
-                  {' '}
-                  {successMessage}
-                </Alert>
-                
-              )}
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }}> {successMessage}</Alert>
+                )}
               </CardContent>
             </Card>
           </Grid>
