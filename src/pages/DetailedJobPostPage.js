@@ -23,7 +23,7 @@ import { LoadingButton } from '@mui/lab';
 
 import Scrollbar from '../components/scrollbar';
 
-export default function DetailedJobPostPage({role}) {
+export default function DetailedJobPostPage({ role }) {
   const navigate = useNavigate();
   const jobId = useParams().jobId;
   const student = role === 'student';
@@ -31,6 +31,8 @@ export default function DetailedJobPostPage({role}) {
   const authToken = new Cookies().get('token');
   const [jobPost, setJobPost] = useState({});
   const [errMsg, setErrMsg] = useState();
+  const [successMsg, setSuccessMsg] = useState();
+
   const [applied, setApplied] = useState('');
   const [favoriteJob, setFavoriteJob] = useState(null);
   console.log(authToken);
@@ -53,7 +55,6 @@ export default function DetailedJobPostPage({role}) {
         setErrMsg(error);
         console.log(error);
       });
-      
   }, []);
 
   const hanldeFavoriteJob = () => {
@@ -61,15 +62,22 @@ export default function DetailedJobPostPage({role}) {
       method: 'POST',
       headers: {
         Authorization: authToken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({"job_id": jobId})
+      body: JSON.stringify({ job_id: jobId }),
     })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        if(data.success===false){setErrMsg(data.error)}
+        if (data.success === false) {
+          setErrMsg(data.error);
+          setSuccessMsg('');
+        }
+        else{
         setFavoriteJob(true);
+        setSuccessMsg(data.message);
+        setErrMsg('');
+        }
       })
       .catch((error) => {
         setErrMsg(error);
@@ -125,19 +133,16 @@ export default function DetailedJobPostPage({role}) {
                   </TableContainer>
                 </Scrollbar>
 
-                {student && (<div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                   <LoadingButton
-                    size="large"
-                    variant="contained"
-                    onClick={hanldeFavoriteJob}
-                  >
-                    Add to Favorites
-                  </LoadingButton>
-                </div>)}
-
+                {student && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <LoadingButton size="large" variant="contained" onClick={hanldeFavoriteJob}>
+                      Add to Favorites
+                    </LoadingButton>
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                   <LoadingButton
+                  <LoadingButton
                     size="large"
                     variant="contained"
                     disabled={applied}
@@ -149,24 +154,33 @@ export default function DetailedJobPostPage({role}) {
                   </LoadingButton>
                 </div>
 
-                { applied && <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                   <LoadingButton
-                    size="large"
-                    variant="contained"
-                    onClick={() => {
-                      navigate(`/application`);
-                    }}
-                  >
-                    Go to Applications
-                  </LoadingButton>
-                </div>}
+                {applied && (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                    <LoadingButton
+                      size="large"
+                      variant="contained"
+                      onClick={() => {
+                        navigate(`/application`);
+                      }}
+                    >
+                      Go to Applications
+                    </LoadingButton>
+                  </div>
+                )}
 
                 {errMsg && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
-                  {' '}
-                  {errMsg}
-                </Alert>
-              )}
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
+                    {' '}
+                    {errMsg}
+                  </Alert>
+                )}
+
+                {successMsg && (
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="success">
+                    {' '}
+                    {successMsg}
+                  </Alert>
+                )}
               </CardContent>
             </Card>
           </Grid>

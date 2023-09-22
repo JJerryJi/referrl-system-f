@@ -251,7 +251,7 @@ export default function FavoriteJobPostPage({ authToken }) {
                               variant="contained"
                               size="small"
                               color="info"
-                              disabled={!job_open_status || !isJobApplied}
+                              disabled={!job_open_status || (isJobApplied && currentJobStatus !== 'In Progress')}
                               onClick={() => {
                                 navigate(`/application/${job_id}`);
                               }}
@@ -269,7 +269,7 @@ export default function FavoriteJobPostPage({ authToken }) {
                                 'default'
                               }
                             >
-                              {currentJobStatus || 'Not Available'}
+                              {currentJobStatus || (job_open_status ? 'Waiting for your Application' : 'The Job is Closed') }
                             </Label>
                           </TableCell>
 

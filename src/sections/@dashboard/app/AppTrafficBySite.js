@@ -31,8 +31,7 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
         >
           {list.map((job) => (
             <Paper key={job.job_id} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
-              <Typography variant="h6">Job {job.job_id } {job.job_company}</Typography>
-
+              <Typography variant="h6">Job {job.job_id }: {job.job_company}</Typography>
               <Typography variant="body3" sx={{ color: 'text.secondary' }}>
                 {' '}
                 {job.job_name}{' '}
