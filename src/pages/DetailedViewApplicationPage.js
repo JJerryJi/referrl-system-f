@@ -87,20 +87,36 @@ export default function DetailedViewApplicationPage() {
         Authorization: authToken, // Add your authorization token here
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({"status": status}),
+      body: JSON.stringify({ "status": status }),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to update application status');
-        }        
+        }
         return response.json();
-      }).then((data)=>{
-        if(data.success === false)
-        {setSuccessMessage(data.message);
-        setErrorMessage('');}
-        else{
-            setErrorMessage(data.error);
-            setSuccessMessage('');
+      })
+      .then((data) => {
+        if (data.success === true) {
+          setSuccessMessage(data.message);
+
+          const applicantWS = new WebSocket(`ws://127.0.0.1:8001/ws/${data.application.user_id}`);
+          console.log(applicantWS);
+
+          applicantWS.onopen = () => {
+            console.log('WebSocket connection opened for applicant');
+          };
+
+          applicantWS.onclose = () => {
+            console.log('WebSocket connection closed for applicant');
+          };
+
+          
+
+          setErrorMessage('');
+        } else {
+          setErrorMessage(data.error);
+          setSuccessMessage('');
+          console.log(data);
         }
       })
       .catch((error) => {
@@ -259,18 +275,14 @@ export default function DetailedViewApplicationPage() {
                 </div>
 
                 {errorMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
-                  {' '}
-                  {errorMessage}
-                </Alert>
-              )}
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} severity="error">
+                    {' '}
+                    {errorMessage}
+                  </Alert>
+                )}
                 {successMessage && (
-                <Alert sx={{ justifyContent: 'center', marginTop: '10px' }} >
-                  {' '}
-                  {successMessage}
-                </Alert>
-                
-              )}
+                  <Alert sx={{ justifyContent: 'center', marginTop: '10px' }}> {successMessage}</Alert>
+                )}
               </CardContent>
             </Card>
           </Grid>

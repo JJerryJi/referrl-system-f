@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { set, sub } from 'date-fns';
 import { noCase } from 'change-case';
 import { faker } from '@faker-js/faker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Cookies from 'universal-cookie';
 // @mui
 import {
   Box,
@@ -77,7 +78,47 @@ const NOTIFICATIONS = [
 ];
 
 export default function NotificationsPopover() {
+  const token = new Cookies().get('token'); 
+  const [id, setId] = useState(null);
   const [notifications, setNotifications] = useState(NOTIFICATIONS);
+
+  const [socket, setSocket] = useState(null);
+
+
+  useEffect(() => {
+    // Fetch the user's ID using the token
+    fetch(`http://127.0.0.1:8000/api/token?token=${token?.split(' ')[1]}`, {
+      method: 'GET',
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setId(data.user_id);
+
+        // Establish the WebSocket connection with the user's ID
+        const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
+        // newSocket.addEventListener('open', () => {
+        //   console.log('WebSocket connection opened');
+        // });
+
+        newSocket.onmessage = (event) => {
+          // Handle incoming WebSocket messages for the applicant
+          const newNotification = JSON.parse(event.data);
+          console.log('Received WebSocket message:', newNotification);
+          setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+        };
+
+        // newSocket.addEventListener('close', () => {
+        //   console.log('WebSocket connection closed');
+        // });
+        setSocket(newSocket);
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+  }, [token]);
 
   const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
@@ -98,6 +139,22 @@ export default function NotificationsPopover() {
         isUnRead: false,
       }))
     );
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    // Find the clicked notification by its ID
+    const updatedNotifications = notifications.map((notification) => {
+      if (notification.id === notificationId) {
+        return {
+          ...notification,
+          isUnRead: !notification.isUnRead,
+        };
+      }
+      return notification;
+    });
+
+    // Update the state with the modified notifications
+    setNotifications(updatedNotifications);
   };
 
   return (
@@ -150,9 +207,18 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notifications
+              .slice(0, 5)
+              .map(
+                (notification) =>
+                  notification.isUnRead === true && (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onClick={() => handleMarkAsRead(notification.id)}
+                    />
+                  )
+              )}
           </List>
 
           <List
@@ -163,9 +229,14 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notifications
+              .slice(0, 5)
+              .map(
+                (notification) =>
+                  notification.isUnRead === false && (
+                    <NotificationItem key={notification.id} notification={notification} onClick={() =>  handleMarkAsRead(notification.id)} />
+                  )
+              )}
           </List>
         </Scrollbar>
 
@@ -195,7 +266,7 @@ NotificationItem.propTypes = {
   }),
 };
 
-function NotificationItem({ notification }) {
+function NotificationItem({ notification, onClick }) {
   const { avatar, title } = renderContent(notification);
 
   return (
@@ -208,6 +279,7 @@ function NotificationItem({ notification }) {
           bgcolor: 'action.selected',
         }),
       }}
+      onClick={onClick}
     >
       <ListItemAvatar>
         <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar>
