@@ -176,7 +176,7 @@ export default function EditApplicationPage(){
                   size="large"
                   variant="contained"
                   onClick={() => {
-                    navigate(`/dashboard/application`);
+                    navigate(`/application`);
                   }}
                 >
                   Back to All Applications

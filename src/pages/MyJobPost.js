@@ -178,7 +178,7 @@ export default function MyJobPosts({ authToken }) {
                         <TableCell align="left">
                           <Button
                             onClick={() => {
-                              navigate(`/dashboard/job-posts/${job_id}`);
+                              navigate(`/job-posts/${job_id}`);
                             }}
                           >
                             Job {job_id}
@@ -233,7 +233,7 @@ export default function MyJobPosts({ authToken }) {
                             color="info"
                             variant="contained"
                             onClick={() => {
-                              navigate(`/dashboard/edit-job-posts/${job_id}`);
+                              navigate(`/edit-job-posts/${job_id}`);
                             }}
                             disabled={job_review_status === 'In-review'}
                           >

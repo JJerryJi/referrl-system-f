@@ -184,7 +184,7 @@ export default function BlogPage({ authToken }) {
                         <TableCell align="left">
                           <Button
                             onClick={() => {
-                              navigate(`/dashboard/job-posts/${job_id}`);
+                              navigate(`/job-posts/${job_id}`);
                             }}
                           >
                             Job {job_id}
@@ -214,7 +214,7 @@ export default function BlogPage({ authToken }) {
                               color="info"
                               variant="contained"
                               onClick={() => {
-                                navigate(`/dashboard/edit-application/${id}`);
+                                navigate(`/edit-application/${id}`);
                               }}
                             >
                               Modify Application

@@ -39,7 +39,7 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
               </Typography>
               <Box>
                 {' '}
-                <Button sx={{ color: '#1565c0' }} onClick={()=>{navigate(`/dashboard/job-posts/${job.job_id}`)}}>Learn more about this Job</Button>
+                <Button sx={{ color: '#1565c0' }} onClick={()=>{navigate(`/job-posts/${job.job_id}`)}}>Learn more about this Job</Button>
               </Box>
             </Paper>
           ))}

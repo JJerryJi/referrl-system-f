@@ -142,7 +142,7 @@ export default function DetailedJobPostPage({role}) {
                     variant="contained"
                     disabled={applied}
                     onClick={() => {
-                      navigate(`/dashboard/application/${jobId}`);
+                      navigate(`/application/${jobId}`);
                     }}
                   >
                     Apply for this Job
@@ -154,7 +154,7 @@ export default function DetailedJobPostPage({role}) {
                     size="large"
                     variant="contained"
                     onClick={() => {
-                      navigate(`/dashboard/application`);
+                      navigate(`/application`);
                     }}
                   >
                     Go to Applications

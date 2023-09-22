@@ -239,7 +239,7 @@ export default function FavoriteJobPostPage({ authToken }) {
                           <TableCell align="left">
                             <Button
                               onClick={() => {
-                                navigate(`/dashboard/job-posts/${job_id}`);
+                                navigate(`/job-posts/${job_id}`);
                               }}
                             >
                               Job {job_id}
@@ -253,7 +253,7 @@ export default function FavoriteJobPostPage({ authToken }) {
                               color="info"
                               disabled={!job_open_status || !isJobApplied}
                               onClick={() => {
-                                navigate(`/dashboard/application/${job_id}`);
+                                navigate(`/application/${job_id}`);
                               }}
                             >
                               Application Link

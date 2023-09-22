@@ -70,12 +70,12 @@ export default function AccountPopover() {
 
   const handleCloseProfile = () => {
     setOpen(null);
-    navigate('/dashboard/profile')
+    navigate('/profile')
   };
 
   const hanldeCloseHome = () => {
     setOpen(null);
-    navigate('/dashboard/job-posts');
+    navigate('/job-posts');
   };
 
   return (

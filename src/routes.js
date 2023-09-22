@@ -52,10 +52,10 @@ export default function Router() {
   });
   const routes = useRoutes([
     {
-      path: '/dashboard',
+      path: '/',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/job-posts" />, index: true },
+        { element: <Navigate to="/job-posts" />, index: true },
         { path: 'job-posts', element: <DashboardAppPage /> },
         { path: 'job-posts/:jobId', element: <DetailedJobPostPage role={role}/>},
         { path: 'edit-job-posts/:jobId', element: <EditJobPostPage />},
@@ -82,7 +82,7 @@ export default function Router() {
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],

@@ -228,7 +228,7 @@ export default function EditJobPostPage() {
                       size="large"
                       variant="contained"
                       onClick={() => {
-                        navigate(`/dashboard/job-posts`);
+                        navigate(`/job-posts`);
                       }}
                     >
                       Back to All Job Posts

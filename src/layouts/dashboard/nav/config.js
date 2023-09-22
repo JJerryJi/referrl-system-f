@@ -8,12 +8,12 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
 const navConfig = [
   {
     title: 'Job Posts Dashboard',
-    path: '/dashboard/job-posts',
+    path: '/job-posts',
     icon: icon('ic_analytics'),
   },
   {
     title: 'user',
-    path: '/dashboard/user',
+    path: '/user',
     icon: icon('ic_user'),
   },
   // {
@@ -23,22 +23,22 @@ const navConfig = [
   // },
   {
     title: 'My Job Posts',
-    path: '/dashboard/my-job-posts',
+    path: '/my-job-posts',
     icon: icon('ic_analytics'),
   },
   {
     title: 'application',
-    path: '/dashboard/application',
+    path: '/application',
     icon: icon('ic_blog'),
   },
     {
     title: 'Saved Job Posts',
-    path: '/dashboard/favorite-job-posts',
+    path: '/favorite-job-posts',
     icon: icon('ic_cart'),
   },
   {
     title: 'profile',
-    path: '/dashboard/Profile',
+    path: '/profile',
     icon: icon('ic_user'),
   },
   {

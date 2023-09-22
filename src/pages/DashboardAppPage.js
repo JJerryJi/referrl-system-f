@@ -44,7 +44,7 @@ export default function DashboardAppPage() {
             Here are all job posts
           </Typography>
 
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={()=>{navigate('/dashboard/new-job-posts')}}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={()=>{navigate('/new-job-posts')}}>
             New Job Post
           </Button>
         </Stack>

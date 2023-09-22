@@ -47,7 +47,7 @@ export default function LoginForm() {
         console.log(data.token);
         console.log(cookies.get('token'));
 
-        navigate('/dashboard', { replace: true });
+        navigate('/', { replace: true });
       } else {
         // Handle login failure, display an error message, etc.
         console.error('Login failed');
