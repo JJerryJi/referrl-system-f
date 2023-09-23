@@ -52,14 +52,22 @@ export default function DashboardAppPage() {
   const [filterName, setfilterName] = useState('');
 
   const handleSearchJob = (event) => {
-    setfilterName(event.target.value);
+    const searchQuery = event.target.value.toLowerCase(); // Convert query to lowercase
+  
+    setfilterName(searchQuery);
+  
     const searchedJobPosts = allJobPosts.filter((job) => {
-      return event.target.value
-        ? job.job_name.indexOf(event.target.value) > -1 || job.job_company.indexOf(event.target.value) > -1
+      const jobName = job.job_name.toLowerCase(); // Convert job name to lowercase
+      const jobCompany = job.job_company.toLowerCase(); // Convert job company to lowercase
+  
+      return searchQuery
+        ? jobName.includes(searchQuery) || jobCompany.includes(searchQuery)
         : true;
     });
+  
     setJobPosts(searchedJobPosts);
   };
+  
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

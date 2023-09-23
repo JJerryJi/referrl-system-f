@@ -48,13 +48,12 @@ export default function AppTrafficBySite({ title, subheader, list, filterName, o
   const navigate = useNavigate();
   return (
     <Card {...other}>
-      {/* <CardHeader title={title} subheader={subheader} /> */}
 
       <CardContent>
         <StyledSearch
           value={filterName}
           onChange={onRequestSearch}
-          placeholder="Search Job Name..."
+          placeholder="Search Job Name or Company..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
