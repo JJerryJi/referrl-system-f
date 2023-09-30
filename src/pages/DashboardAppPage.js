@@ -69,15 +69,6 @@ export default function DashboardAppPage() {
   };
   
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
   const handlePopularitySort = () => {
     // Create a new array with the sorted data
     const sortedJobPosts = [...jobPosts].sort((a, b) => b.num_of_applicants - a.num_of_applicants);
@@ -163,18 +154,15 @@ export default function DashboardAppPage() {
                     list={jobPosts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
                     filterName={filterName}
                     onRequestSearch={handleSearchJob}
+                    length={jobPosts.length}
+                    setPage={setPage}
+                    page={page}
+                    setRowsPerPage={setRowsPerPage}
+                    rowsPerPage={rowsPerPage}
                   />
                 </Grid>
               </Scrollbar>
-              <TablePagination
-                rowsPerPageOptions={[6, 12, 24]}
-                component="div"
-                count={jobPosts.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              
             </Table>
           </TableContainer>
         </Grid>

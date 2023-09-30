@@ -10,7 +10,6 @@ export default function LeaderBoardPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [total, setTotal] = useState(0);
 
-
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/job/api/leaderboard?page=${page}&per_page=${rowsPerPage}`)
       .then((response) => {
@@ -54,7 +53,14 @@ export default function LeaderBoardPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={30} md={16} lg={16}>
-              <AppNewsUpdate list={leadingPosts}  total={total} rowsPerPage={rowsPerPage} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}/>
+            <AppNewsUpdate
+              list={leadingPosts}
+              total={total}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              setPage={setPage}
+              setRowsPerPage={setRowsPerPage}
+            />
           </Grid>
         </Grid>
       </Container>

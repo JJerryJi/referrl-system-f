@@ -10,6 +10,7 @@ import {
   Button,
   InputAdornment,
   OutlinedInput,
+  TablePagination
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -44,8 +45,16 @@ AppTrafficBySite.propTypes = {
   list: PropTypes.array.isRequired,
 };
 
-export default function AppTrafficBySite({ title, subheader, list, filterName, onRequestSearch, ...other }) {
+export default function AppTrafficBySite({ title, subheader, list, filterName, onRequestSearch, length, rowsPerPage, page, setPage, setRowsPerPage, ...other }) {
   const navigate = useNavigate();
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
   return (
     <Card {...other}>
 
@@ -91,6 +100,16 @@ export default function AppTrafficBySite({ title, subheader, list, filterName, o
             </Paper>
           ))}
         </Box>
+
+        <TablePagination
+                rowsPerPageOptions={[6, 12, 24]}
+                component="div"
+                count={length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
       </CardContent>
     </Card>
   );
