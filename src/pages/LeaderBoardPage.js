@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Grid, Container, Stack, Typography, TablePagination } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import { AppNewsUpdate } from '../sections/@dashboard/app';
-import Scrollbar from '../components/scrollbar';
 
 export default function LeaderBoardPage() {
   const [leadingPosts, setLeadingPosts] = useState([]);
@@ -11,15 +10,6 @@ export default function LeaderBoardPage() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [total, setTotal] = useState(0);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-    console.log(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/job/api/leaderboard?page=${page}&per_page=${rowsPerPage}`)
@@ -39,7 +29,7 @@ export default function LeaderBoardPage() {
             .map((key) => data[key]);
           // Set the job posts in the state
           setLeadingPosts(jobPosts);
-          // console.log(jobPosts);
+          console.log(jobPosts);
         } else {
           throw new Error('Invalid data');
         }
@@ -58,24 +48,13 @@ export default function LeaderBoardPage() {
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
           <Typography variant="h4" color="#2196f3">
-            Top 5 LeaderBoard
+            Top Job LeaderBoard
           </Typography>
         </Stack>
 
         <Grid container spacing={3}>
           <Grid item xs={30} md={16} lg={16}>
-            <Scrollbar>
-              <AppNewsUpdate list={leadingPosts} />
-            </Scrollbar>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 20]}
-              component="div"
-              count={total}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+              <AppNewsUpdate list={leadingPosts}  total={total} rowsPerPage={rowsPerPage} page={page} setPage={setPage} setRowsPerPage={setRowsPerPage}/>
           </Grid>
         </Grid>
       </Container>
