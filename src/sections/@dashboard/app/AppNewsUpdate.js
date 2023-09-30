@@ -49,7 +49,7 @@ export default function AppNewsUpdate({
       <Scrollbar>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
           {list.map((news, index) => (
-            <NewsItem key={index} news={news} />
+            <NewsItem key={index} news={news} id={index}/>
           ))}
         </Stack>
       </Scrollbar>
@@ -87,19 +87,17 @@ NewsItem.propTypes = {
 };
 
 /* eslint-disable */
-function NewsItem({ news }) {
+function NewsItem({ id, news }) {
   const navigate = useNavigate();
   const { job_post_id, job_name, job_company, created_time, score } = news;
-
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box
         component="img"
-        alt={''}
-        src={'/assets/icons/number1.png'}
+        alt={`${id+1}`}
+        src={`/assets/icons/leaderboard/${id+1}.svg`}
         sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }}
       />
-
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
         <Link
           color="inherit"

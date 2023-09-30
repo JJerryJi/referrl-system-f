@@ -9,12 +9,12 @@ const navConfig = [
   {
     title: 'Job Post Dashboard',
     path: '/job-posts',
-    icon: icon('ic_analytics'),
+    icon: icon('ic_job_post'),
   },
   {
     title: 'Job Post LeaderBoard',
     path: '/leaderboard',
-    icon: icon('ic_analytics'),
+    icon: icon('ic_leaderboard'),
   },
   // {
   //   title: 'user',
@@ -29,22 +29,22 @@ const navConfig = [
   {
     title: 'My Job Posts',
     path: '/my-job-posts',
-    icon: icon('ic_analytics'),
+    icon: icon('ic_application'),
   },
   {
     title: 'application',
     path: '/application',
-    icon: icon('ic_blog'),
+    icon: icon('ic_application'),
   },
     {
     title: 'Saved Job Posts',
     path: '/favorite-job-posts',
-    icon: icon('ic_cart'),
+    icon: icon('ic_favorite'),
   },
   {
     title: 'profile',
     path: '/profile',
-    icon: icon('ic_user'),
+    icon: icon('ic_profile'),
   },
   {
     title: 'login',
