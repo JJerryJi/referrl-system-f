@@ -7,15 +7,20 @@ const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ 
 
 const navConfig = [
   {
-    title: 'Job Posts Dashboard',
+    title: 'Job Post Dashboard',
     path: '/job-posts',
     icon: icon('ic_analytics'),
   },
   {
-    title: 'user',
-    path: '/user',
-    icon: icon('ic_user'),
+    title: 'Job Post LeaderBoard',
+    path: '/leaderboard',
+    icon: icon('ic_analytics'),
   },
+  // {
+  //   title: 'user',
+  //   path: '/user',
+  //   icon: icon('ic_user'),
+  // },
   // {
   //   title: 'product',
   //   path: '/dashboard/products',
@@ -51,11 +56,11 @@ const navConfig = [
     path: '/signup',
     icon: icon('ic_lock'),
   },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic_disabled'),
+  // },
 ];
 
 export default navConfig;

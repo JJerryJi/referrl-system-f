@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 // @mui
 import PropTypes from 'prop-types';
 import { Box, Stack, Link, Card, Button, Divider, Typography, CardHeader } from '@mui/material';
@@ -22,8 +24,8 @@ export default function AppNewsUpdate({ title, subheader, list, ...other }) {
 
       <Scrollbar>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
-          {list.map((news) => (
-            <NewsItem key={news.id} news={news} />
+          {list.map((news, index) => (
+            <NewsItem key={index} news={news} />
           ))}
         </Stack>
       </Scrollbar>
@@ -50,26 +52,40 @@ NewsItem.propTypes = {
   }),
 };
 
+/* eslint-disable */
 function NewsItem({ news }) {
-  const { image, title, description, postedAt } = news;
+  const navigate = useNavigate();
+  const { job_post_id, job_name, job_company, created_time, score } = news;
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
-      <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
+      <Box component="img" alt={''} src={'/assets/icons/number1.png'} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
 
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
-        <Link color="inherit" variant="subtitle2" underline="hover" noWrap>
-          {title}
+        <Link
+          color="inherit"
+          variant="subtitle2"
+          underline="hover"
+          noWrap
+          onClick={() => navigate(`/job-posts/${job_post_id}`)}
+        >
+          {job_name}
         </Link>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-          {description}
+          {job_company}
         </Typography>
       </Box>
 
+      <Box>
+      <Typography variant="body2" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
+        {score} points
+      </Typography>  
       <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
-        {fToNow(postedAt)}
+        {fToNow(created_time)}
       </Typography>
+      </Box>
     </Stack>
   );
 }
+/* eslint-disable */

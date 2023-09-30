@@ -22,6 +22,8 @@ import DetailedViewApplicationPage from './pages/DetailedViewApplicationPage'
 import MyJobPosts from './pages/MyJobPost';
 import EditJobPostPage from './pages/EditJobPostPage'
 import FavoriteJobPostPage from './pages/FavoriteJobPostPage';
+import LeaderBoardPage from './pages/LeaderBoardPage';
+
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -57,6 +59,7 @@ export default function Router() {
       children: [
         { element: <Navigate to="/job-posts" />, index: true },
         { path: 'job-posts', element: <DashboardAppPage /> },
+        { path: 'leaderboard', element: <LeaderBoardPage /> },
         { path: 'job-posts/:jobId', element: <DetailedJobPostPage role={role}/>},
         { path: 'edit-job-posts/:jobId', element: <EditJobPostPage />},
         { path: 'application/:jobId', element: <SubmitApplicationPage />},
