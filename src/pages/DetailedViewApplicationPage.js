@@ -27,7 +27,6 @@ import { fDateTime } from '../utils/formatTime';
 export default function DetailedViewApplicationPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('');
   const authToken = new Cookies().get('token');
   console.log(applicationId);
   const [application, setApplication] = useState([]);
@@ -76,10 +75,6 @@ export default function DetailedViewApplicationPage() {
 
   // Handler for the "Select this Application" button
   const handleSelectApplication = (status) => {
-    const headers = {
-      Authorization: authToken, // Add your authorization token here
-      'Content-Type': 'application/json',
-    };
     // Send the PUT request to update the application status
     fetch(`http://127.0.0.1:8000/application/api/application/${applicationId}`, {
       method: 'PUT',
@@ -96,7 +91,7 @@ export default function DetailedViewApplicationPage() {
         return response.json();
       })
       .then((data) => {
-        if (data.success === false) {
+        if (data.success === true) {
           setSuccessMessage(data.message);
           setErrorMessage('');
         } else {
@@ -113,6 +108,7 @@ export default function DetailedViewApplicationPage() {
 
   const handleSelection = () => {
     handleSelectApplication('Selected');
+    console.log('selected');
   };
 
   const handleReject = () => {
@@ -245,7 +241,7 @@ export default function DetailedViewApplicationPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                   <LoadingButton
                     size="large"
-                    variant={status === 'Pass' ? 'contained' : 'outlined'}
+                    variant='contained'
                     color="success"
                     value="success"
                     onClick={handleSelection}
@@ -257,7 +253,7 @@ export default function DetailedViewApplicationPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                   <LoadingButton
                     size="large"
-                    variant={status === 'Fail' ? 'contained' : 'outlined'}
+                    variant='contained'
                     color="error"
                     value="Fail"
                     onClick={handleReject}
