@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { set, sub } from 'date-fns';
 import { noCase } from 'change-case';
 import { faker } from '@faker-js/faker';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Cookies from 'universal-cookie';
 // @mui
 import {
   Box,
@@ -28,56 +29,108 @@ import Scrollbar from '../../../components/scrollbar';
 
 // ----------------------------------------------------------------------
 
-const NOTIFICATIONS = [
-  {
-    id: faker.datatype.uuid(),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
-    avatar: null,
-    type: 'order_placed',
-    createdAt: set(new Date(), { hours: 10, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: faker.name.fullName(),
-    description: 'answered to your comment on the Minimal',
-    avatar: '/assets/images/avatars/avatar_2.jpg',
-    type: 'friend_interactive',
-    createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new message',
-    description: '5 unread messages',
-    avatar: null,
-    type: 'chat_message',
-    createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new mail',
-    description: 'sent from Guido Padberg',
-    avatar: null,
-    type: 'mail',
-    createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'Delivery processing',
-    description: 'Your order is being shipped',
-    avatar: null,
-    type: 'order_shipped',
-    createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-];
+// const NOTIFICATIONS = [
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'Your order is placed',
+//     description: 'waiting for shipping',
+//     avatar: null,
+//     type: 'order_placed',
+//     createdAt: set(new Date(), { hours: 10, minutes: 30 }),
+//     isUnRead: true,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: faker.name.fullName(),
+//     description: 'answered to your comment on the Minimal',
+//     avatar: '/assets/images/avatars/avatar_2.jpg',
+//     type: 'friend_interactive',
+//     createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
+//     isUnRead: true,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'You have new message',
+//     description: '5 unread messages',
+//     avatar: null,
+//     type: 'chat_message',
+//     createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'You have new mail',
+//     description: 'sent from Guido Padberg',
+//     avatar: null,
+//     type: 'mail',
+//     createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'Delivery processing',
+//     description: 'Your order is being shipped',
+//     avatar: null,
+//     type: 'order_shipped',
+//     createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+// ];
 
 export default function NotificationsPopover() {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const token = new Cookies().get('token');
+  const [id, setId] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    // Fetch the user's ID using the token
+    fetch(`http://127.0.0.1:8000/api/token?token=${token?.split(' ')[1]}`, {
+      method: 'GET',
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setId(data.user_id);
+
+        // Establish the WebSocket connection with the user's ID
+        // const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
+
+        // newSocket.addEventListener('open', () => {
+        //   console.log('WebSocket connection opened');
+        // });
+
+
+        // newSocket.onmessage = (event) => {
+        //   // Handle incoming WebSocket messages for the applicant
+        //   const newNotification = JSON.parse(event.data);
+        //   console.log('Received WebSocket message:', newNotification);
+        //   if (newNotification.filteredId && newNotification.filteredId === data.user_id) {
+        //     setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+        //   }
+        // };
+        // setSocket(newSocket);
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+  }, [token]);
+
+  const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${id}`);
+
+  newSocket.addEventListener('open', () => {
+    console.log('WebSocket connection opened');
+  });
+
+  newSocket.onmessage = (event) => {
+    // Handle incoming WebSocket messages for the applicant
+    const newNotification = JSON.parse(event.data);
+    console.log('Received WebSocket message:', newNotification);
+    if (newNotification.filteredId && newNotification.filteredId === id) {
+      setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+    }
+  };
 
   const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
@@ -98,6 +151,21 @@ export default function NotificationsPopover() {
         isUnRead: false,
       }))
     );
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    // Find the clicked notification by its ID
+    const updatedNotifications = notifications.map((notification) => {
+      if (notification.id === notificationId) {
+        return {
+          ...notification,
+          isUnRead: !notification.isUnRead,
+        };
+      }
+      return notification;
+    });
+    // Update the state with the modified notifications
+    setNotifications(updatedNotifications);
   };
 
   return (
@@ -150,9 +218,18 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notifications
+              .slice(0, 5)
+              .map(
+                (notification) =>
+                  notification.isUnRead === true && (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onClick={() => handleMarkAsRead(notification.id)}
+                    />
+                  )
+              )}
           </List>
 
           <List
@@ -163,9 +240,18 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notifications
+              .slice(0, 5)
+              .map(
+                (notification) =>
+                  notification.isUnRead === false && (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onClick={() => handleMarkAsRead(notification.id)}
+                    />
+                  )
+              )}
           </List>
         </Scrollbar>
 
@@ -195,7 +281,7 @@ NotificationItem.propTypes = {
   }),
 };
 
-function NotificationItem({ notification }) {
+function NotificationItem({ notification, onClick }) {
   const { avatar, title } = renderContent(notification);
 
   return (
@@ -208,6 +294,7 @@ function NotificationItem({ notification }) {
           bgcolor: 'action.selected',
         }),
       }}
+      onClick={onClick}
     >
       <ListItemAvatar>
         <Avatar sx={{ bgcolor: 'background.neutral' }}>{avatar}</Avatar>

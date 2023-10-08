@@ -131,7 +131,7 @@ export default function BlogPage({ authToken }) {
 
         const data = await response.json();
         setApplications(data.application);
-        console.log(data.application);
+        // console.log(data.application);
       } catch (error) {
         console.error('Error fetching applications:', error);
       }

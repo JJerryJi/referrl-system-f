@@ -96,7 +96,7 @@ export default function DetailedViewApplicationPage() {
         return response.json();
       })
       .then((data) => {
-        if (data.success === false) {
+        if (data.success === true) {
           setSuccessMessage(data.message);
           setErrorMessage('');
         } else {
