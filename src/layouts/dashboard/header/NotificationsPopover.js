@@ -81,6 +81,7 @@ export default function NotificationsPopover() {
   const token = new Cookies().get('token');
   const [id, setId] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [totalUnRead, setTotalUnRead] = useState(0);
 
   useEffect(() => {
     // Fetch the user's ID using the token
@@ -129,10 +130,11 @@ export default function NotificationsPopover() {
     console.log('Received WebSocket message:', newNotification);
     if (newNotification.filteredId && newNotification.filteredId === id) {
       setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+      setTotalUnRead(num => num+1);
     }
   };
 
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+  // const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
   const [open, setOpen] = useState(null);
 
@@ -153,7 +155,7 @@ export default function NotificationsPopover() {
     );
   };
 
-  const handleMarkAsRead = (notificationId) => {
+  const handleMarkAsRead = (notificationId, readOrUnread) => {
     // Find the clicked notification by its ID
     const updatedNotifications = notifications.map((notification) => {
       if (notification.id === notificationId) {
@@ -166,6 +168,11 @@ export default function NotificationsPopover() {
     });
     // Update the state with the modified notifications
     setNotifications(updatedNotifications);
+    if (readOrUnread === "read")
+      setTotalUnRead(num=>num-1);
+    else 
+      setTotalUnRead(num=>num+1);
+
   };
 
   return (
@@ -226,7 +233,7 @@ export default function NotificationsPopover() {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onClick={() => handleMarkAsRead(notification.id)}
+                      onClick={() => handleMarkAsRead(notification.id, "read")}
                     />
                   )
               )}
@@ -248,7 +255,7 @@ export default function NotificationsPopover() {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onClick={() => handleMarkAsRead(notification.id)}
+                      onClick={() => handleMarkAsRead(notification.id, "unread")}
                     />
                   )
               )}
