@@ -18,12 +18,12 @@ AppNewsUpdate.propTypes = {
 };
 
 export default function AppNewsUpdate({
-  // title & subheader 
+  // title & subheader
   title,
   subheader,
-  // list of leading job posts 
+  // list of leading job posts
   list,
-  // total number of job posts 
+  // total number of job posts
   total,
   // callback functions
   rowsPerPage,
@@ -49,7 +49,7 @@ export default function AppNewsUpdate({
       <Scrollbar>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
           {list.map((news, index) => (
-            <NewsItem key={index} news={news} id={index}/>
+            <NewsItem key={index} news={news} id={index} />
           ))}
         </Stack>
       </Scrollbar>
@@ -94,8 +94,8 @@ function NewsItem({ id, news }) {
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box
         component="img"
-        alt={`${id+1}`}
-        src={`/assets/icons/leaderboard/${id+1}.svg`}
+        alt={`${id + 1}`}
+        src={`/assets/icons/leaderboard/${id + 1}.svg`}
         sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }}
       />
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
@@ -114,8 +114,8 @@ function NewsItem({ id, news }) {
         </Typography>
       </Box>
 
-      <Box>
-        <Typography variant="body2" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
+      <Box sx={{textAlign:'right'}}>
+        <Typography variant="body2" sx={{ pr: 3, flexShrink: 0, color: 'text.primary' }}>
           {score} points
         </Typography>
         <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>

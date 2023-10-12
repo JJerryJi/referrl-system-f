@@ -36,9 +36,10 @@ export default function SignupForm() {
     });
   };
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear + i);
+  const years = Array.from({ length: 6 }, (_, i) => currentYear + i);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
+  const yearsInSchool = [1, 2, 3, 4, 5];
   // function to validate the form:
   const validateForm = () => {
     // Define required fields for each role
@@ -48,12 +49,18 @@ export default function SignupForm() {
       alumni: ['company_name'],
     };
 
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
     // Check common fields
     let error = null;
     requiredFields.common.forEach((field) => {
       if (!formData[field]) {
         setErrorMessage(`Missing required field: ${field}`);
         error = `Missing required field: ${field}`;
+        console.log(error);
+      } else if (field === 'email' && !formData[field].match(emailRegex)) {
+        setErrorMessage(`Invalid email address`);
+        error = 'Invalid email address';
         console.log(error);
       }
     });
@@ -75,13 +82,10 @@ export default function SignupForm() {
 
   const handleSubmit = () => {
     const result = validateForm();
-    console.log(result);
+    // console.log(result);
     if (result === null) {
       // Combine graduation_year and graduation_month into a date-time string
-      formData.graduation_year = `${formData.year}-${String(formData.graduation_month).padStart(
-        2,
-        '0'
-      )}-01T00:00:00`;
+      formData.graduation_year = `${formData.year}-${String(formData.graduation_month).padStart(2, '0')}-01T00:00:00`;
 
       console.log(formData);
 
@@ -98,19 +102,18 @@ export default function SignupForm() {
         })
         .then((data) => {
           console.log(data);
-          if (data.success===false){
+          if (!data.success) {
             setSuccessMessage(null);
             setErrorMessage(data.error);
-          }
-          else if (data.success === true) {
-          setSuccessMessage(data.message);
-          console.log(successMessage);
-          setErrorMessage(null);
-          throw new Error(data.message);
+          } else if (data.success) {
+            setSuccessMessage(data.message);
+            console.log(successMessage);
+            setErrorMessage(null);
+            throw new Error(data.message);
           }
 
           // navigate('/login');
-        })
+        });
     }
   };
 
@@ -154,11 +157,11 @@ export default function SignupForm() {
                 label="Year in School"
                 fullWidth
               >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                <MenuItem value={4}>4</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
+                {yearsInSchool.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <TextField name="major" label="Major" value={formData.major} onChange={handleInputChange} fullWidth />
@@ -171,12 +174,7 @@ export default function SignupForm() {
             </FormControl>
             <FormControl fullWidth>
               <InputLabel>Graduation Year</InputLabel>
-              <Select
-                name="year"
-                value={formData.year}
-                onChange={handleInputChange}
-                label="Graduation Year"
-              >
+              <Select name="year" value={formData.year} onChange={handleInputChange} label="Graduation Year">
                 {years.map((year) => (
                   <MenuItem key={year} value={year}>
                     {year}
@@ -239,7 +237,7 @@ export default function SignupForm() {
       </LoadingButton>
       <Stack alignItems="center" sx={{ my: 2 }}>
         {errorMessage && (
-          <Alert size="large" sx={{whiteSpace:'pre-line'}} severity="error">
+          <Alert size="large" sx={{ whiteSpace: 'pre-line' }} severity="error">
             Error: {errorMessage}
           </Alert>
         )}

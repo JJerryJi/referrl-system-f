@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
-import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,17 +10,12 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
 } from '@mui/material';
@@ -48,7 +42,7 @@ export default function BlogPage({ authToken }) {
   // const cookies = new Cookies();
   // const token = cookies.get('token');
   const token = authToken;
-  console.log(token);
+  // console.log(token);
   const navigate = useNavigate();
 
   // multiple page design
@@ -90,7 +84,6 @@ export default function BlogPage({ authToken }) {
   };
 
   function applySortFilter(array, comparator, query) {
-    // console.log('app test');
     const stabilizedThis = array.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0]);
@@ -98,7 +91,6 @@ export default function BlogPage({ authToken }) {
       return a[1] - b[1];
     });
     if (query) {
-      // console.log(array);
       return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);

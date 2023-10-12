@@ -27,14 +27,14 @@ export default function DetailedJobPostPage({ role }) {
   const navigate = useNavigate();
   const jobId = useParams().jobId;
   const student = role === 'student';
-  console.log(student);
+  // console.log(student);
   const authToken = new Cookies().get('token');
   const [jobPost, setJobPost] = useState({});
   const [errMsg, setErrMsg] = useState();
   const [successMsg, setSuccessMsg] = useState();
 
   const [applied, setApplied] = useState('');
-  const [favoriteJob, setFavoriteJob] = useState(null);
+  // const [favoriteJob, setFavoriteJob] = useState(null);
   console.log(authToken);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function DetailedJobPostPage({ role }) {
           setSuccessMsg('');
         }
         else{
-        setFavoriteJob(true);
+        // setFavoriteJob(true);
         setSuccessMsg(data.message);
         setErrMsg('');
         }

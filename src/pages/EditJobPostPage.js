@@ -13,13 +13,14 @@ import {
   FormControl,
   InputLabel,
   Input,
+  Select,
+  MenuItem,
   Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
 import Scrollbar from '../components/scrollbar';
 import { validateJobPostForm } from '../utils/validateForms';
-
 
 export default function EditJobPostPage() {
   const { jobId } = useParams();
@@ -31,6 +32,7 @@ export default function EditJobPostPage() {
 
   // Initialize formData state to store form data
   const [formData, setFormData] = useState({
+    job_open_status: '',
     job_name: '',
     job_company: '',
     job_requirement: '',
@@ -45,8 +47,8 @@ export default function EditJobPostPage() {
           headers: { Authorization: authToken },
         });
         const data = await response.json();
-        setFormData(data?.job_post)
-        console.log(data.job_post)
+        setFormData(data?.job_post);
+        console.log(data.job_post);
       } catch (error) {
         console.log('Error fetching job posts:', error);
         throw error;
@@ -54,37 +56,6 @@ export default function EditJobPostPage() {
     }
     fetchJobPosts();
   }, [authToken]);
-  // validate the form
-//   const validateJobPostForm = (formData) => {
-//     const errors = {};
-
-//     // Validate job_name (example: should not be empty)
-//     if (!formData.job_name.trim()) {
-//       errors.job_name = 'Job Name is required';
-//     }
-
-//     // Validate job_company (example: should not be empty)
-//     if (!formData.job_company.trim()) {
-//       errors.job_company = 'Company Name is required';
-//     }
-
-//     // Validate job_requirement (example: should not be empty)
-//     if (!formData.job_requirement.trim()) {
-//       errors.job_requirement = 'Job Requirement is required';
-//     }
-
-//     // Validate question (example: should not be empty)
-//     if (!formData.job_question.trim()) {
-//       errors.job_question = 'Job Question is required';
-//     }
-
-//     // Validate job_description (example: should not be empty)
-//     if (!formData.job_description.trim()) {
-//       errors.job_description = 'Job Description is required';
-//     }
-
-//     return errors;
-//   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,7 +77,7 @@ export default function EditJobPostPage() {
 
         const data = await response.json();
 
-        if (data.success === true) {
+        if (data.success) {
           console.log('Job Post Updates submitted successfully');
           setSuccessMessage(data.message);
           setErrorMessage('');
@@ -150,7 +121,8 @@ export default function EditJobPostPage() {
               <CardHeader title="Content" />
               <CardContent>
                 <Scrollbar>
-                  <form onSubmit={handleSubmit} noValidate>
+                  <form onSubmit={handleSubmit}>
+
                     <FormControl fullWidth sx={{ mt: 0.75, mb: 3 }}>
                       <InputLabel> Job Post Name</InputLabel>
                       <Input
@@ -211,6 +183,14 @@ export default function EditJobPostPage() {
                       />
                     </FormControl>
 
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel>Open Status</InputLabel>
+                      <Select name="job_open_status" value={formData.job_open_status} onChange={handleChange} required>
+                        <MenuItem value="accept">Open</MenuItem>
+                        <MenuItem value="closed">Closed</MenuItem>
+                      </Select>
+                    </FormControl>
+
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
                       <LoadingButton
                         type="submit"
@@ -234,6 +214,7 @@ export default function EditJobPostPage() {
                       Back to All Job Posts
                     </LoadingButton>
                   </div>
+
                   {errorMessage && (
                     <Alert
                       sx={{ justifyContent: 'center', marginTop: '10px', whiteSpace: 'pre-wrap' }}

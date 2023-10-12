@@ -77,6 +77,7 @@ import Scrollbar from '../../../components/scrollbar';
 //   },
 // ];
 
+
 export default function NotificationsPopover() {
   const token = new Cookies().get('token');
   const [id, setId] = useState(null);
@@ -84,6 +85,8 @@ export default function NotificationsPopover() {
   const [totalUnRead, setTotalUnRead] = useState(0);
 
   useEffect(() => {
+
+
     // Fetch the user's ID using the token
     fetch(`http://127.0.0.1:8000/api/token?token=${token?.split(' ')[1]}`, {
       method: 'GET',
@@ -95,45 +98,52 @@ export default function NotificationsPopover() {
         console.log(data);
         setId(data.user_id);
 
-        // Establish the WebSocket connection with the user's ID
-        // const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
 
-        // newSocket.addEventListener('open', () => {
-        //   console.log('WebSocket connection opened');
-        // });
+        const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
 
+        newSocket.addEventListener('open', () => {
+          console.log('WebSocket connection opened');
+        });
+      
+        newSocket.onmessage = (event) => {
+          // Handle incoming WebSocket messages for the applicant
+          const newNotification = JSON.parse(event.data);
+          console.log('Received WebSocket message:', newNotification);
+          if (newNotification.filteredId && newNotification.filteredId === data.user_id) {
+            setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+            setTotalUnRead(num => num+1);
+          }
+        };
+      
+        newSocket.onclose = () =>{console.log('close')}
 
-        // newSocket.onmessage = (event) => {
-        //   // Handle incoming WebSocket messages for the applicant
-        //   const newNotification = JSON.parse(event.data);
-        //   console.log('Received WebSocket message:', newNotification);
-        //   if (newNotification.filteredId && newNotification.filteredId === data.user_id) {
-        //     setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
-        //   }
-        // };
-        // setSocket(newSocket);
       })
       .catch((error) => {
         throw new Error(error);
       });
   }, [token]);
 
-  const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${id}`);
 
-  newSocket.addEventListener('open', () => {
-    console.log('WebSocket connection opened');
-  });
+//   if (id !== null){
+//   const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${id}`);
 
-  newSocket.onmessage = (event) => {
-    // Handle incoming WebSocket messages for the applicant
-    const newNotification = JSON.parse(event.data);
-    console.log('Received WebSocket message:', newNotification);
-    if (newNotification.filteredId && newNotification.filteredId === id) {
-      setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
-      setTotalUnRead(num => num+1);
-    }
-  };
+//   newSocket.addEventListener('open', () => {
+//     console.log('WebSocket connection opened');
+//   });
 
+//   newSocket.onmessage = (event) => {
+//     // Handle incoming WebSocket messages for the applicant
+//     const newNotification = JSON.parse(event.data);
+//     console.log('Received WebSocket message:', newNotification);
+//     if (newNotification.filteredId && newNotification.filteredId === id) {
+//       setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+//       setTotalUnRead(num => num+1);
+//     }
+//   };
+
+//   newSocket.onclose = () =>{console.log('close')}
+
+// }
   // const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
   const [open, setOpen] = useState(null);
@@ -153,6 +163,8 @@ export default function NotificationsPopover() {
         isUnRead: false,
       }))
     );
+
+    setTotalUnRead(0)
   };
 
   const handleMarkAsRead = (notificationId, readOrUnread) => {
