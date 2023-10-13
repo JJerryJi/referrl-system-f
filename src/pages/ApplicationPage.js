@@ -101,9 +101,9 @@ export default function BlogPage({ authToken }) {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-  let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
+  let filteredApplication = applySortFilter(applications, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredApplication.length && !!filterName;
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - applications.length) : 0;
   const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
 
@@ -129,7 +129,7 @@ export default function BlogPage({ authToken }) {
       }
     }
     fetchApplications();
-    filteredUsers = applySortFilter(applications, getComparator(order, orderBy), '');
+    filteredApplication = applySortFilter(applications, getComparator(order, orderBy), '');
   }, []);
 
   return (
@@ -158,7 +158,7 @@ export default function BlogPage({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
+                  {filteredApplication.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
                     /* eslint-disable  */
                     // console.log(application);
                     let { id, job_id, modified_date, status } = application;
@@ -253,7 +253,7 @@ export default function BlogPage({ authToken }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={applications?.length}
+            count={filteredApplication?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

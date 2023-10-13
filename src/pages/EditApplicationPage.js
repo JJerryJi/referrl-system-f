@@ -125,7 +125,7 @@ export default function EditApplicationPage() {
   return (
     <Container style={{ maxWidth: '90%' }}>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Modify for Application ID: {applicationId}
+        Modify Application ID: {applicationId}
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={32} md={16} lg={16}>

@@ -14,7 +14,7 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
-import navConfig from './config';
+import { navConfig, nagConfigStudent, nagConfigAlumni } from './config';
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +40,7 @@ export default function Nav({ openNav, onCloseNav }) {
   const token = cookies.get('token')?.split(' ')[1];
   const { pathname } = useLocation();
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState('')
   const [error, setErrorMsg] = useState('');
 
   const isDesktop = useResponsive('up', 'lg');
@@ -60,8 +61,12 @@ export default function Nav({ openNav, onCloseNav }) {
         return response.json();
       })
       .then((data) => {
-        if (data.username) {
+        if(data.username) {
           setUsername(data.username);
+        }if(data.student_id) {
+          setRole('Student Applicant')
+        }else if (data.alumni_id){
+          setRole('Referral Poster')
         }
       })
       .catch((error) => {
@@ -88,19 +93,20 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {/* {account.displayName} */}
                 {username}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
+                {role}
               </Typography>
             </Box>
           </StyledAccount>
         </Link>
       </Box>
 
-      <NavSection data={navConfig} />
+    {role === 'Student Applicant' && <NavSection data={nagConfigStudent} />}
+    {role === 'Referral Poster' && <NavSection data={nagConfigAlumni} />}
+    {role === '' && <NavSection data={navConfig} />}
 
       <Box sx={{ flexGrow: 1 }} />
 
