@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { sentenceCase } from 'change-case';
 import { filter } from 'lodash';
-import Cookies from 'universal-cookie';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,17 +10,12 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
 } from '@mui/material';
@@ -48,7 +42,7 @@ export default function BlogPage({ authToken }) {
   // const cookies = new Cookies();
   // const token = cookies.get('token');
   const token = authToken;
-  console.log(token);
+  // console.log(token);
   const navigate = useNavigate();
 
   // multiple page design
@@ -90,7 +84,6 @@ export default function BlogPage({ authToken }) {
   };
 
   function applySortFilter(array, comparator, query) {
-    // console.log('app test');
     const stabilizedThis = array.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0]);
@@ -98,7 +91,6 @@ export default function BlogPage({ authToken }) {
       return a[1] - b[1];
     });
     if (query) {
-      // console.log(array);
       return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
     }
     return stabilizedThis.map((el) => el[0]);
@@ -109,9 +101,9 @@ export default function BlogPage({ authToken }) {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-  let filteredUsers = applySortFilter(applications, getComparator(order, orderBy), filterName);
+  let filteredApplication = applySortFilter(applications, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredApplication.length && !!filterName;
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - applications.length) : 0;
   const ApplicationEndpoint = `http://127.0.0.1:8000/application/api/application`;
 
@@ -131,13 +123,13 @@ export default function BlogPage({ authToken }) {
 
         const data = await response.json();
         setApplications(data.application);
-        console.log(data.application);
+        // console.log(data.application);
       } catch (error) {
         console.error('Error fetching applications:', error);
       }
     }
     fetchApplications();
-    filteredUsers = applySortFilter(applications, getComparator(order, orderBy), '');
+    filteredApplication = applySortFilter(applications, getComparator(order, orderBy), '');
   }, []);
 
   return (
@@ -166,7 +158,7 @@ export default function BlogPage({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
+                  {filteredApplication.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
                     /* eslint-disable  */
                     // console.log(application);
                     let { id, job_id, modified_date, status } = application;
@@ -261,7 +253,7 @@ export default function BlogPage({ authToken }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={applications?.length}
+            count={filteredApplication?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

@@ -41,7 +41,6 @@ const TABLE_HEAD = [
   { id: 'job_review_status', label: 'Review Status', alignRight: false },
   { id: 'num_of_applicants', label: 'Num of Applicants', alignRight: false },
   { id: 'detail_view', label: 'Action', alignRight: false },
-
 ];
 
 // ----------------------------------------------------------------------
@@ -49,7 +48,7 @@ const TABLE_HEAD = [
 export default function MyJobPosts({ authToken }) {
   const token = authToken;
   console.log(token);
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   // multiple page design
   const [page, setPage] = useState(0);
@@ -59,7 +58,6 @@ export default function MyJobPosts({ authToken }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('job_id');
   const [filterName, setFilterName] = useState('');
-  
 
   function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -91,7 +89,16 @@ export default function MyJobPosts({ authToken }) {
     });
     if (query) {
       // console.log(array);
-      return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
+      query = query.toLowerCase();
+      return filter(
+        array,
+        (el) =>
+          el.job_id.toString().toLowerCase().includes(query) ||
+          el.job_company.toString().toLowerCase().includes(query) ||
+          el.job_open_status.toString().toLowerCase().includes(query) ||
+          el.num_of_applicants.toString().toLowerCase().includes(query) ||
+          el.job_review_status.toString().toLowerCase().includes(query)
+      );
     }
     return stabilizedThis.map((el) => el[0]);
   }
@@ -155,7 +162,7 @@ export default function MyJobPosts({ authToken }) {
         </Stack>
 
         <Card>
-          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} placeholderText={'Search...'} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -174,7 +181,6 @@ export default function MyJobPosts({ authToken }) {
                     /* eslint-disable  */
                     return (
                       <TableRow hover key={job_id} tabIndex={-1}>
-
                         <TableCell align="left">
                           <Button
                             onClick={() => {
@@ -193,7 +199,6 @@ export default function MyJobPosts({ authToken }) {
                           </Stack>
                         </TableCell>
 
-
                         <TableCell align="left">
                           <Label
                             color={
@@ -205,7 +210,6 @@ export default function MyJobPosts({ authToken }) {
                             {job_open_status}
                           </Label>
                         </TableCell>
-
 
                         <TableCell align="left">
                           <Label
@@ -275,13 +279,12 @@ export default function MyJobPosts({ authToken }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={jobPosts?.length}
+            count={filteredJobPosts?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-
         </Card>
       </Container>
     </>

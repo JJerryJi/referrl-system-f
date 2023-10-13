@@ -128,7 +128,7 @@ export default function DecideApplicationPage({ authToken }) {
 
         const data = await response.json();
         setApplications(data.application);
-        console.log(data.application);
+        // console.log(data.application);
       } catch (error) {
         console.error('Error fetching applications:', error);
       }
@@ -250,7 +250,7 @@ export default function DecideApplicationPage({ authToken }) {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={applications?.length}
+            count={filteredUsers?.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

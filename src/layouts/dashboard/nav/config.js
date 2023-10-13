@@ -16,27 +16,45 @@ const navConfig = [
     path: '/leaderboard',
     icon: icon('ic_leaderboard'),
   },
-  // {
-  //   title: 'user',
-  //   path: '/user',
-  //   icon: icon('ic_user'),
-  // },
-  // {
-  //   title: 'product',
-  //   path: '/dashboard/products',
-  //   icon: icon('ic_cart'),
-  // },
   {
-    title: 'My Job Posts',
-    path: '/my-job-posts',
+    title: 'application',
+    path: '/application',
     icon: icon('ic_application'),
+  },
+  {
+    title: 'profile',
+    path: '/profile',
+    icon: icon('ic_profile'),
+  },
+  {
+    title: 'login',
+    path: '/login',
+    icon: icon('ic_lock'),
+  },
+  {
+    title: 'signup',
+    path: '/signup',
+    icon: icon('ic_lock'),
+  },
+];
+
+const nagConfigStudent = [  
+  {
+    title: 'Job Post Dashboard',
+    path: '/job-posts',
+    icon: icon('ic_job_post'),
+  },
+  {
+    title: 'Job Post LeaderBoard',
+    path: '/leaderboard',
+    icon: icon('ic_leaderboard'),
   },
   {
     title: 'application',
     path: '/application',
     icon: icon('ic_application'),
   },
-    {
+  {
     title: 'Saved Job Posts',
     path: '/favorite-job-posts',
     icon: icon('ic_favorite'),
@@ -56,11 +74,43 @@ const navConfig = [
     path: '/signup',
     icon: icon('ic_lock'),
   },
-  // {
-  //   title: 'Not found',
-  //   path: '/404',
-  //   icon: icon('ic_disabled'),
-  // },
 ];
 
-export default navConfig;
+const nagConfigAlumni = [  
+  {
+    title: 'Job Posts Dashboard',
+    path: '/job-posts',
+    icon: icon('ic_job_post'),
+  },
+  {
+    title: 'Post LeaderBoard',
+    path: '/leaderboard',
+    icon: icon('ic_leaderboard'),
+  },
+  {
+    title: 'My Posts',
+    path: '/my-job-posts',
+    icon: icon('ic_application'),
+  },
+  {
+    title: 'application',
+    path: '/application',
+    icon: icon('ic_application'),
+  },
+  {
+    title: 'profile',
+    path: '/profile',
+    icon: icon('ic_profile'),
+  },
+  {
+    title: 'login',
+    path: '/login',
+    icon: icon('ic_lock'),
+  },
+  {
+    title: 'signup',
+    path: '/signup',
+    icon: icon('ic_lock'),
+  },
+];
+export { navConfig, nagConfigStudent, nagConfigAlumni };

@@ -67,7 +67,7 @@ export default function DetailedViewApplicationPage() {
         console.log(error);
       });
     // get applicant data
-  }, [authToken]);
+  });
 
   const applicationArray = Object.entries(application);
   const applicantArray = Object.entries(applicant);

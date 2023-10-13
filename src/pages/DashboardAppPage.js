@@ -43,7 +43,7 @@ export default function DashboardAppPage() {
   const navigate = useNavigate();
   const cookies = new Cookies();
   const authToken = cookies.get('token');
-  console.log(authToken);
+  // console.log(authToken);
   const [jobPosts, setJobPosts] = useState([]);
   const [allJobPosts, setAllJobPosts] = useState([]);
 
@@ -53,7 +53,6 @@ export default function DashboardAppPage() {
 
   const handleSearchJob = (event) => {
     const searchQuery = event.target.value.toLowerCase(); // Convert query to lowercase
-  
     setfilterName(searchQuery);
   
     const searchedJobPosts = allJobPosts.filter((job) => {
@@ -72,11 +71,10 @@ export default function DashboardAppPage() {
   const handlePopularitySort = () => {
     // Create a new array with the sorted data
     const sortedJobPosts = [...jobPosts].sort((a, b) => b.num_of_applicants - a.num_of_applicants);
-    console.log(
-      'after sorted',
-      sortedJobPosts.map((job) => job.num_of_applicants)
-    );
-
+    // console.log(
+    //   'after sorted',
+    //   sortedJobPosts.map((job) => job.num_of_applicants)
+    // );
     // Update the state with the new sorted array
     setJobPosts(sortedJobPosts);
   };
@@ -88,12 +86,10 @@ export default function DashboardAppPage() {
       const timeB = new Date(b.job_created_time).getTime();
       return timeB - timeA;
     });
-
-    console.log(
-      'after sorted',
-      sortedJobPosts.map((job) => job.job_created_time)
-    );
-
+    // console.log(
+    //   'after sorted',
+    //   sortedJobPosts.map((job) => job.job_created_time)
+    // );
     // Update the state with the new sorted array
     setJobPosts(sortedJobPosts);
   };
