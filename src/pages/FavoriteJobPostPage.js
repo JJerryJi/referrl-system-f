@@ -139,7 +139,7 @@ export default function FavoriteJobPostPage({ authToken }) {
         return response.json();
       })
       .then((data) => {
-        if(data.success){
+        if (data.success) {
           setSuccessMessage(data.message);
           setOpen(null);
         }
@@ -184,10 +184,10 @@ export default function FavoriteJobPostPage({ authToken }) {
         // Create an array to store the status of each favorite job
         const appliedJobStatus = data.favorite_jobs.map((favoriteJob) => {
           const matchingApplication = applications.find((application) => application.job_id === favoriteJob.job_id);
-          return matchingApplication ? matchingApplication.status : '';
+          return matchingApplication ? [matchingApplication.status, matchingApplication.id] : '';
         });
-        console.log(appliedJobStatus);
-        console.log(ifApplied);
+        console.log('job status', appliedJobStatus);
+        console.log('if applied before:', ifApplied);
         setAppliedInfo(ifApplied); // Store the applied info in state
         setAppliedJobStatus(appliedJobStatus); // Store the job status in state
       } catch (error) {
@@ -232,7 +232,12 @@ export default function FavoriteJobPostPage({ authToken }) {
                       // job_id: current job id
                       let { id, job_id, job_open_status } = application;
                       let isJobApplied = appliedInfo[index];
-                      let currentJobStatus = appliedJobStatus[index];
+                      let currentJobStatus='';
+                      if(appliedJobStatus[index]){
+                        console.log('applied job status:', appliedJobStatus[index][0]);
+                        currentJobStatus = appliedJobStatus[index][0];
+                      }
+                      // let currentJobStatus = appliedJobStatus[index][0];
                       /* eslint-disable  */
                       return (
                         <TableRow hover key={job_id} tabIndex={-1}>
@@ -253,7 +258,8 @@ export default function FavoriteJobPostPage({ authToken }) {
                               color="info"
                               disabled={!job_open_status || (isJobApplied && currentJobStatus !== 'In Progress')}
                               onClick={() => {
-                                navigate(`/application/${job_id}`);
+                                if (currentJobStatus === 'In Progress') navigate(`/edit-application/${appliedJobStatus[index][1]}`);
+                                else navigate(`/application/${job_id}`);
                               }}
                             >
                               Application Link
@@ -269,7 +275,8 @@ export default function FavoriteJobPostPage({ authToken }) {
                                 'default'
                               }
                             >
-                              {currentJobStatus || (job_open_status ? 'Waiting for your Application' : 'The Job is Closed') }
+                              {currentJobStatus ||
+                                (job_open_status ? 'Waiting for your Application' : 'The Job is Closed')}
                             </Label>
                           </TableCell>
 
@@ -318,7 +325,6 @@ export default function FavoriteJobPostPage({ authToken }) {
               </Table>
             </TableContainer>
           </Scrollbar>
-
 
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
