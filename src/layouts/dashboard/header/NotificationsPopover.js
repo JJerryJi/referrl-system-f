@@ -77,7 +77,6 @@ import Scrollbar from '../../../components/scrollbar';
 //   },
 // ];
 
-
 export default function NotificationsPopover() {
   const token = new Cookies().get('token');
   const [id, setId] = useState(null);
@@ -85,7 +84,29 @@ export default function NotificationsPopover() {
   const [totalUnRead, setTotalUnRead] = useState(0);
 
   useEffect(() => {
+    // manage websocket connection & ready to re-connect every 3 seconds
+    const websocketConnect = (data) => {
+      const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
 
+      newSocket.addEventListener('open', () => {
+        console.log('WebSocket connection opened');
+      });
+
+      newSocket.onmessage = (event) => {
+        // Handle incoming WebSocket messages for the applicant
+        const newNotification = JSON.parse(event.data);
+        console.log('Received WebSocket message:', newNotification);
+        if (newNotification.filteredId && newNotification.filteredId === data.user_id) {
+          setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+          setTotalUnRead((num) => num + 1);
+        }
+      };
+
+      newSocket.onclose = () => {
+        setTimeout(websocketConnect, 5000, data);
+        console.log('reconnected');
+      };
+    };
 
     // Fetch the user's ID using the token
     fetch(`http://127.0.0.1:8000/api/token?token=${token?.split(' ')[1]}`, {
@@ -97,54 +118,13 @@ export default function NotificationsPopover() {
       .then((data) => {
         console.log(data);
         setId(data.user_id);
-
-
-        const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${data.user_id}`);
-
-        newSocket.addEventListener('open', () => {
-          console.log('WebSocket connection opened');
-        });
-      
-        newSocket.onmessage = (event) => {
-          // Handle incoming WebSocket messages for the applicant
-          const newNotification = JSON.parse(event.data);
-          console.log('Received WebSocket message:', newNotification);
-          if (newNotification.filteredId && newNotification.filteredId === data.user_id) {
-            setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
-            setTotalUnRead(num => num+1);
-          }
-        };
-      
-        newSocket.onclose = () =>{console.log('close')}
-
+        // call websocket connection here:
+        websocketConnect(data);
       })
       .catch((error) => {
         throw new Error(error);
       });
   }, [token]);
-
-
-//   if (id !== null){
-//   const newSocket = new WebSocket(`ws://127.0.0.1:8001/ws/${id}`);
-
-//   newSocket.addEventListener('open', () => {
-//     console.log('WebSocket connection opened');
-//   });
-
-//   newSocket.onmessage = (event) => {
-//     // Handle incoming WebSocket messages for the applicant
-//     const newNotification = JSON.parse(event.data);
-//     console.log('Received WebSocket message:', newNotification);
-//     if (newNotification.filteredId && newNotification.filteredId === id) {
-//       setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
-//       setTotalUnRead(num => num+1);
-//     }
-//   };
-
-//   newSocket.onclose = () =>{console.log('close')}
-
-// }
-  // const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
 
   const [open, setOpen] = useState(null);
 
@@ -164,7 +144,7 @@ export default function NotificationsPopover() {
       }))
     );
 
-    setTotalUnRead(0)
+    setTotalUnRead(0);
   };
 
   const handleMarkAsRead = (notificationId, readOrUnread) => {
@@ -180,11 +160,11 @@ export default function NotificationsPopover() {
     });
     // Update the state with the modified notifications
     setNotifications(updatedNotifications);
-    if (readOrUnread === "read")
-      setTotalUnRead(num=>num-1);
-    else 
-      setTotalUnRead(num=>num+1);
-
+    if (readOrUnread === 'read') {
+      setTotalUnRead((num) => num - 1);
+    } else {
+      setTotalUnRead((num) => num + 1);
+    }
   };
 
   return (
@@ -245,7 +225,7 @@ export default function NotificationsPopover() {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onClick={() => handleMarkAsRead(notification.id, "read")}
+                      onClick={() => handleMarkAsRead(notification.id, 'read')}
                     />
                   )
               )}
@@ -267,7 +247,7 @@ export default function NotificationsPopover() {
                     <NotificationItem
                       key={notification.id}
                       notification={notification}
-                      onClick={() => handleMarkAsRead(notification.id, "unread")}
+                      onClick={() => handleMarkAsRead(notification.id, 'unread')}
                     />
                   )
               )}
