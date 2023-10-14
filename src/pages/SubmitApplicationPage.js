@@ -99,7 +99,7 @@ export default function SubmitApplicationPage() {
               <CardHeader title="Application" />
               <CardContent>
                 <Scrollbar>
-                  <form onSubmit={handleSubmit} noValidate>
+                  <form onSubmit={handleSubmit}>
                     <FormControl fullWidth sx={{ mb: 3 }}>
                       <Input type="file" name="resume" onChange={handleChange} required />
                     </FormControl>
