@@ -26,7 +26,6 @@ import { fDateTime } from '../utils/formatTime';
 
 export default function DetailedViewApplicationPage() {
   const { applicationId } = useParams();
-  const navigate = useNavigate();
   const authToken = new Cookies().get('token');
   console.log(applicationId);
   const [application, setApplication] = useState([]);
@@ -46,7 +45,7 @@ export default function DetailedViewApplicationPage() {
         return response.json();
       })
       .then((data) => {
-        console.log(data.application);
+        // console.log(data.application);
         setApplication(data.application);
 
         if (data.application.student_id) {
@@ -67,7 +66,7 @@ export default function DetailedViewApplicationPage() {
         console.log(error);
       });
     // get applicant data
-  });
+  }, []);
 
   const applicationArray = Object.entries(application);
   const applicantArray = Object.entries(applicant);

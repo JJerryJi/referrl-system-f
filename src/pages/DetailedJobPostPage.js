@@ -141,18 +141,18 @@ export default function DetailedJobPostPage({ role }) {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                {!applied && <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
                   <LoadingButton
                     size="large"
                     variant="contained"
-                    disabled={applied}
+                    // disabled={applied}
                     onClick={() => {
                       navigate(`/application/${jobId}`);
                     }}
                   >
                     Apply for this Job
                   </LoadingButton>
-                </div>
+                </div>}
 
                 {applied && (
                   <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>

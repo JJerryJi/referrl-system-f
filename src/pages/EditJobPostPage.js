@@ -113,7 +113,7 @@ export default function EditJobPostPage() {
       </Helmet>
       <Container style={{ maxWidth: '90%' }}>
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Edit my Job Post
+          Edit This Referral Post
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={32} md={16} lg={16}>
@@ -198,7 +198,7 @@ export default function EditJobPostPage() {
                         variant="contained"
                         // You can apply error style here based on your requirements
                       >
-                        Apply
+                        Edit This Post
                       </LoadingButton>
                     </div>
                   </form>

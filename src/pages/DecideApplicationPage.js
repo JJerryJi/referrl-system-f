@@ -87,7 +87,13 @@ export default function DecideApplicationPage({ authToken }) {
     });
     if (query) {
       // console.log(array);
-      return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
+      return filter(
+        array,
+        (el) =>
+          el.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          el.status.toLowerCase().split('-').join(' ').indexOf(query.toLowerCase()) !== -1 ||
+          el.job_id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1
+      );
     }
     return stabilizedThis.map((el) => el[0]);
   }
@@ -128,6 +134,7 @@ export default function DecideApplicationPage({ authToken }) {
 
         const data = await response.json();
         setApplications(data.application);
+        console.log(data.application);
         // console.log(data.application);
       } catch (error) {
         console.error('Error fetching applications:', error);
@@ -146,12 +153,12 @@ export default function DecideApplicationPage({ authToken }) {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            All Applications of my Job Posts
+            All Applications of my Referral Posts
           </Typography>
         </Stack>
 
         <Card>
-          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} placeholderText={'Search ...'} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>

@@ -157,7 +157,7 @@ export default function MyJobPosts({ authToken }) {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            My job Posts
+            My Job Posts
           </Typography>
         </Stack>
 
