@@ -13,6 +13,7 @@ import {
   FormControl,
   InputLabel,
   Input,
+  Link,
   Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -26,6 +27,7 @@ export default function EditApplicationPage() {
   console.log(applicationId);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [resumeAvailable, setResumeAvailable] = useState(false);
 
   // Initialize formData state to store form data
   const [formData, setFormData] = useState({
@@ -51,6 +53,9 @@ export default function EditApplicationPage() {
           // populate the field with
           console.log(data);
           setFormData(data.application);
+          if (data.application?.resume_path) {
+            setResumeAvailable(true);
+          }
         } else {
           const data = await response.json();
           console.log(data);
@@ -70,10 +75,13 @@ export default function EditApplicationPage() {
 
     if (type === 'file') {
       const file = e.target.files[0]; // Get the selected file
-      setFormData({
-        ...formData,
-        [name]: file, // Attach the file to the corresponding field in formData
-      });
+      if(file){
+        setResumeAvailable(false);
+        setFormData({
+          ...formData,
+          [name]: file, // Attach the file to the corresponding field in formData
+        });
+      }
     } else {
       // Handle other form fields (e.g., text input, textarea) here
       const { value } = e.target;
@@ -124,7 +132,7 @@ export default function EditApplicationPage() {
 
   return (
     <Container style={{ maxWidth: '90%' }}>
-      <Typography variant="h4" sx={{ mb: 5 }}>
+      <Typography variant="h4" sx={{ mb: 3 }}>
         Modify Application ID: {applicationId}
       </Typography>
       <Grid container spacing={2}>
@@ -133,8 +141,18 @@ export default function EditApplicationPage() {
             <CardHeader title="Application" />
             <CardContent>
               <Scrollbar>
+                {resumeAvailable && (
+                  <Link
+                    href={`http://127.0.0.1:8000/${formData.resume_path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ mb: 2 }}
+                  >
+                    Preview Previous Resume
+                  </Link>
+                )}
                 <form onSubmit={handleSubmit}>
-                  <FormControl fullWidth sx={{ mb: 3 }}>
+                  <FormControl fullWidth sx={{ mb: 3, mt: 1 }}>
                     <Input type="file" name="resume_path" accept=".pdf" onChange={handleChange} required />
                   </FormControl>
 
