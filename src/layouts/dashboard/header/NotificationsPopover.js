@@ -21,6 +21,7 @@ import {
   ListItemAvatar,
   ListItemButton,
 } from '@mui/material';
+
 // utils
 import { fToNow } from '../../../utils/formatTime';
 // components
@@ -29,59 +30,12 @@ import Scrollbar from '../../../components/scrollbar';
 
 // ----------------------------------------------------------------------
 
-// const NOTIFICATIONS = [
-//   {
-//     id: faker.datatype.uuid(),
-//     title: 'Your order is placed',
-//     description: 'waiting for shipping',
-//     avatar: null,
-//     type: 'order_placed',
-//     createdAt: set(new Date(), { hours: 10, minutes: 30 }),
-//     isUnRead: true,
-//   },
-//   {
-//     id: faker.datatype.uuid(),
-//     title: faker.name.fullName(),
-//     description: 'answered to your comment on the Minimal',
-//     avatar: '/assets/images/avatars/avatar_2.jpg',
-//     type: 'friend_interactive',
-//     createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
-//     isUnRead: true,
-//   },
-//   {
-//     id: faker.datatype.uuid(),
-//     title: 'You have new message',
-//     description: '5 unread messages',
-//     avatar: null,
-//     type: 'chat_message',
-//     createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
-//     isUnRead: false,
-//   },
-//   {
-//     id: faker.datatype.uuid(),
-//     title: 'You have new mail',
-//     description: 'sent from Guido Padberg',
-//     avatar: null,
-//     type: 'mail',
-//     createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
-//     isUnRead: false,
-//   },
-//   {
-//     id: faker.datatype.uuid(),
-//     title: 'Delivery processing',
-//     description: 'Your order is being shipped',
-//     avatar: null,
-//     type: 'order_shipped',
-//     createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
-//     isUnRead: false,
-//   },
-// ];
-
 export default function NotificationsPopover() {
   const token = new Cookies().get('token');
   const [id, setId] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [totalUnRead, setTotalUnRead] = useState(0);
+  const [displayNum, setDisplayNum] = useState(5);
 
   useEffect(() => {
     // manage websocket connection & ready to re-connect every 3 seconds
@@ -218,7 +172,7 @@ export default function NotificationsPopover() {
             }
           >
             {notifications
-              .slice(0, 5)
+              .slice(0, displayNum)
               .map(
                 (notification) =>
                   notification.isUnRead === true && (
@@ -240,7 +194,7 @@ export default function NotificationsPopover() {
             }
           >
             {notifications
-              .slice(0, 5)
+              .slice(0, displayNum)
               .map(
                 (notification) =>
                   notification.isUnRead === false && (
@@ -257,7 +211,7 @@ export default function NotificationsPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth disableRipple>
+          <Button fullWidth disableRipple onClick={()=>{setDisplayNum(notifications.length)}}>
             View All
           </Button>
         </Box>
@@ -270,7 +224,7 @@ export default function NotificationsPopover() {
 
 NotificationItem.propTypes = {
   notification: PropTypes.shape({
-    createdAt: PropTypes.instanceOf(Date),
+    // createdAt: PropTypes.instanceOf(Date),
     id: PropTypes.string,
     isUnRead: PropTypes.bool,
     title: PropTypes.string,
@@ -280,8 +234,37 @@ NotificationItem.propTypes = {
   }),
 };
 
+// Function to format the time elapsed since the notification was created
+const formatTimeElapsed = (createdAt) => {
+  const currentTime = new Date();
+  const createdAtTime = new Date(createdAt);
+  const timeDifference = currentTime - createdAtTime;
+  const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+
+  if (minutesDifference < 1) {
+    return 'less than one min ago';
+  }
+
+  if (minutesDifference < 60) {
+    return `about ${minutesDifference} min ago`;
+  }
+  const hoursDifference = Math.floor(minutesDifference / 60);
+  return `about ${hoursDifference} hr ago`;
+};
+
 function NotificationItem({ notification, onClick }) {
   const { avatar, title } = renderContent(notification);
+  const [elapsedTime, setElapsedTime] = useState(formatTimeElapsed(notification.createdAt));
+
+  // Update the elapsed time every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setElapsedTime(formatTimeElapsed(notification.createdAt));
+    }, 60000); // Update every minute (60000 milliseconds)
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [notification.createdAt, elapsedTime]);
 
   return (
     <ListItemButton
@@ -311,7 +294,7 @@ function NotificationItem({ notification, onClick }) {
             }}
           >
             <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
-            {fToNow(notification.createdAt)}
+            {elapsedTime}
           </Typography>
         }
       />

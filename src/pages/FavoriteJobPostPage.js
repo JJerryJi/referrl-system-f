@@ -34,9 +34,9 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'job_id', label: 'Favorite Job Link', alignRight: false },
+  { id: 'jobId', label: 'Favorite Job Link', alignRight: false },
   { id: 'application_link', label: 'Application Link', alignRight: false },
-  { id: 'application_status', label: 'Status', alignRight: false },
+  { id: 'AppStatus', label: 'Status', alignRight: false },
   { id: '' },
 ];
 
@@ -55,11 +55,9 @@ export default function FavoriteJobPostPage({ authToken }) {
   // multiple page design
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [appliedInfo, setAppliedInfo] = useState([]);
-  const [appliedJobStatus, setAppliedJobStatus] = useState([]);
   const [favoriteJobs, setFavoriteJobs] = useState([]);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('job_id');
+  const [orderBy, setOrderBy] = useState('');
   const [filterName, setFilterName] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -110,7 +108,12 @@ export default function FavoriteJobPostPage({ authToken }) {
       return a[1] - b[1];
     });
     if (query) {
-      return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
+      return filter(
+        array,
+        (el) =>
+          el.jobId.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          el.appStatus.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1
+      );
     }
     return stabilizedThis.map((el) => el[0]);
   }
@@ -136,7 +139,7 @@ export default function FavoriteJobPostPage({ authToken }) {
       },
     })
       .then((response) => {
-        return response.json();
+        response.json();
       })
       .then((data) => {
         if (data.success) {
@@ -163,9 +166,6 @@ export default function FavoriteJobPostPage({ authToken }) {
         }
 
         const data = await response.json();
-        setFavoriteJobs(data.favorite_jobs);
-        console.log(data.favorite_jobs);
-
         const applicationInfoResponse = await fetch(`http://127.0.0.1:8000/application/api/application`, {
           headers: { Authorization: token },
         });
@@ -175,21 +175,20 @@ export default function FavoriteJobPostPage({ authToken }) {
         const applicationInfoData = await applicationInfoResponse.json();
         const applications = applicationInfoData.application;
 
-        // Create an array to store whether each favorite job has been applied
-        const ifApplied = data.favorite_jobs.map((favoriteJob) => {
-          // Check if the job is in the applications data
-          return applications.some((application) => application.job_id === favoriteJob.job_id);
+        // Create an array of favorite job objects with their properties
+        const favoriteJobsData = data.favorite_jobs.map((favoriteJob) => {
+          const matchingApplication = applications.find((application) => application.job_id === favoriteJob.job_id);
+          return {
+            id: favoriteJob.id,
+            jobId: favoriteJob.job_id,
+            isOpen: favoriteJob.job_open_status,
+            isApplied: !!matchingApplication,
+            appStatus: matchingApplication ? matchingApplication.status : '',
+            applicationId: matchingApplication ? matchingApplication.id : '',
+          };
         });
 
-        // Create an array to store the status of each favorite job
-        const appliedJobStatus = data.favorite_jobs.map((favoriteJob) => {
-          const matchingApplication = applications.find((application) => application.job_id === favoriteJob.job_id);
-          return matchingApplication ? [matchingApplication.status, matchingApplication.id] : '';
-        });
-        console.log('job status', appliedJobStatus);
-        console.log('if applied before:', ifApplied);
-        setAppliedInfo(ifApplied); // Store the applied info in state
-        setAppliedJobStatus(appliedJobStatus); // Store the job status in state
+        setFavoriteJobs(favoriteJobsData);
       } catch (error) {
         console.error('Error fetching favorite jobs:', error);
       }
@@ -212,7 +211,7 @@ export default function FavoriteJobPostPage({ authToken }) {
         </Stack>
 
         <Card>
-          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} placeholderText="Search ..." />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -224,74 +223,62 @@ export default function FavoriteJobPostPage({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredUsers
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((application, index) => {
-                      /* eslint-disable  */
-                      // id: favorite job id
-                      // job_id: current job id
-                      let { id, job_id, job_open_status } = application;
-                      let isJobApplied = appliedInfo[index];
-                      let currentJobStatus='';
-                      if(appliedJobStatus[index]){
-                        console.log('applied job status:', appliedJobStatus[index][0]);
-                        currentJobStatus = appliedJobStatus[index][0];
-                      }
-                      // let currentJobStatus = appliedJobStatus[index][0];
-                      /* eslint-disable  */
-                      return (
-                        <TableRow hover key={job_id} tabIndex={-1}>
-                          <TableCell align="left">
-                            <Button
-                              onClick={() => {
-                                navigate(`/job-posts/${job_id}`);
-                              }}
-                            >
-                              Job {job_id}
-                            </Button>
-                          </TableCell>
+                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
+                    // id: favorite job id
+                    // jobId: current job id
+                    const { id, jobId, applicationId, isOpen, isApplied, appStatus } = application;
+                    return (
+                      <TableRow hover key={jobId} tabIndex={-1}>
+                        <TableCell align="left">
+                          <Button
+                            onClick={() => {
+                              navigate(`/job-posts/${jobId}`);
+                            }}
+                          >
+                            Job {jobId}
+                          </Button>
+                        </TableCell>
 
-                          <TableCell align="left">
-                            <Button
-                              variant="contained"
-                              size="small"
-                              color="info"
-                              disabled={!job_open_status || (isJobApplied && currentJobStatus !== 'In Progress')}
-                              onClick={() => {
-                                if (currentJobStatus === 'In Progress') navigate(`/edit-application/${appliedJobStatus[index][1]}`);
-                                else navigate(`/application/${job_id}`);
-                              }}
-                            >
-                              Application Link
-                            </Button>
-                          </TableCell>
+                        <TableCell align="left">
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="info"
+                            disabled={!isOpen || (isApplied && appStatus !== 'In Progress')}
+                            onClick={() => {
+                              if (appStatus === 'In Progress') navigate(`/edit-application/${applicationId}`);
+                              else navigate(`/application/${jobId}`);
+                            }}
+                          >
+                            Application Link
+                          </Button>
+                        </TableCell>
 
-                          <TableCell align="left">
-                            <Label
-                              color={
-                                (currentJobStatus === 'In Progress' && 'info') ||
-                                (currentJobStatus === 'Selected' && 'success') ||
-                                (currentJobStatus === 'Not-moving-forward' && 'error') ||
-                                'default'
-                              }
-                            >
-                              {currentJobStatus ||
-                                (job_open_status ? 'Waiting for your Application' : 'The Job is Closed')}
-                            </Label>
-                          </TableCell>
+                        <TableCell align="left">
+                          <Label
+                            color={
+                              (appStatus === 'In Progress' && 'info') ||
+                              (appStatus === 'Selected' && 'success') ||
+                              (appStatus === 'Not-moving-forward' && 'error') ||
+                              'default'
+                            }
+                          >
+                            {appStatus || (isOpen ? 'Waiting for your Application' : 'The Job is Closed')}
+                          </Label>
+                        </TableCell>
 
-                          <TableCell align="right">
-                            <IconButton
-                              size="large"
-                              color="inherit"
-                              onClick={(clickEvent) => handleOpenMenu(clickEvent, id)}
-                            >
-                              <Iconify icon={'eva:more-vertical-fill'} />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                        <TableCell align="right">
+                          <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={(clickEvent) => handleOpenMenu(clickEvent, id)}
+                          >
+                            <Iconify icon={'eva:more-vertical-fill'} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
