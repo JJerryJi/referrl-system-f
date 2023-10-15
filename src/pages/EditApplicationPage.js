@@ -110,14 +110,11 @@ export default function EditApplicationPage() {
         },
         body: formDataObject, // Using FormData for multipart/form-data,
       });
-
-      // You can handle the response based on your requirements
       const data = await response.json();
       console.log('data:', data);
 
-      // Optionally, you can navigate or perform other actions here
       if (data.success === true) {
-        console.log('Application submitted successfully');
+        console.log('Update of Your Application submitted successfully');
         setSuccessMessage(data.message);
         setErrorMessage('');
       } else {

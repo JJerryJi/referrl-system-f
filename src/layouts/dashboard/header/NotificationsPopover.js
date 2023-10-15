@@ -32,7 +32,6 @@ import Scrollbar from '../../../components/scrollbar';
 
 export default function NotificationsPopover() {
   const token = new Cookies().get('token');
-  const [id, setId] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [totalUnRead, setTotalUnRead] = useState(0);
   const [displayNum, setDisplayNum] = useState(5);
@@ -71,7 +70,6 @@ export default function NotificationsPopover() {
       })
       .then((data) => {
         console.log(data);
-        setId(data.user_id);
         // call websocket connection here:
         websocketConnect(data);
       })

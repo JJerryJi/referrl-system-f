@@ -251,6 +251,29 @@ export default function DecideApplicationPage({ authToken }) {
                     </TableRow>
                   </TableBody>
                 )}
+
+                {applications.length === 0 && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            No Applications Yet ...
+                          </Typography>
+
+                          <Typography variant="body2">
+                            Please wait for the applications.
+                            <br /> Good Luck!
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}  
               </Table>
             </TableContainer>
           </Scrollbar>

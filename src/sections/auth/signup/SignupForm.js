@@ -62,7 +62,7 @@ export default function SignupForm() {
           return response.json();
         })
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           if (!data.success) {
             setSuccessMessage(null);
             setErrorMessage(data.error);
@@ -70,9 +70,7 @@ export default function SignupForm() {
             setSuccessMessage(data.message);
             console.log(successMessage);
             setErrorMessage(null);
-            throw new Error(data.message);
           }
-
           // navigate('/login');
         });
     } else {

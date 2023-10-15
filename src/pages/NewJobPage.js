@@ -96,8 +96,8 @@ export default function NewJobPage() {
         const data = await response.json();
 
         if (data.success) {
-          console.log('Application submitted successfully');
-          setSuccessMessage('Application submitted successfully');
+          // console.log('Referral Job Post submitted successfully');
+          setSuccessMessage('Referral Job Post Successfully Submitted');
           setErrorMessage('');
           // navigate(`/dashboard/job-posts/${jobId}`);
         } else {

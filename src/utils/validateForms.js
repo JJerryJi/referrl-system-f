@@ -2,12 +2,12 @@ export function validateJobPostForm(formData) {
   const errors = {};
 
   // Validate job_name
-  const jobNameValidator = /^[a-zA-Z0-9\s-@_]{15,35}$/;
+  const jobNameValidator = /^[a-zA-Z0-9\s-@_()]{10,50}$/;
   if (!formData.job_name.trim()) {
     errors.job_name = 'Job Name is required';
   } else if (!jobNameValidator.test(formData.job_name)) {
     errors.job_name =
-      'Job Name should be 15-35 characters long and may only contain letters, numbers, spaces, and hyphens.';
+      'Job Name should be 10-50 characters long and may only contain letters, numbers, spaces, and hyphens.';
   }
 
   // Validate job_company
@@ -50,7 +50,7 @@ export const validateSignUpForm = (formData) => {
   };
 
   const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  const usernameRegex = /^[A-Za-z0-9]{3,15}$/; // Fixed the regex
+  const usernameRegex = /^[A-Za-z0-9_]{3,15}$/; // Fixed the regex
   const firstNameRegex = /^[A-Za-z]{2,20}$/; // Fixed the regex
   const lastNameRegex = /^[A-Za-z]{2,20}$/; // Fixed the regex
 

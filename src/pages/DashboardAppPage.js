@@ -71,11 +71,6 @@ export default function DashboardAppPage() {
   const handlePopularitySort = () => {
     // Create a new array with the sorted data
     const sortedJobPosts = [...jobPosts].sort((a, b) => b.num_of_applicants - a.num_of_applicants);
-    // console.log(
-    //   'after sorted',
-    //   sortedJobPosts.map((job) => job.num_of_applicants)
-    // );
-    // Update the state with the new sorted array
     setJobPosts(sortedJobPosts);
   };
 
@@ -86,11 +81,6 @@ export default function DashboardAppPage() {
       const timeB = new Date(b.job_created_time).getTime();
       return timeB - timeA;
     });
-    // console.log(
-    //   'after sorted',
-    //   sortedJobPosts.map((job) => job.job_created_time)
-    // );
-    // Update the state with the new sorted array
     setJobPosts(sortedJobPosts);
   };
 
@@ -103,9 +93,9 @@ export default function DashboardAppPage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         // Filter job posts with job_review_status === "Pass"
-        const filteredJobPosts = data.job_post.filter((jobPost) => jobPost.job_review_status === 'Pass');
+        const filteredJobPosts = data.job_post.filter((jobPost) => jobPost.job_review_status === 'Pass' && jobPost.job_open_status === 'accept');
         setJobPosts(filteredJobPosts); // Update the jobPosts state with the filtered data
         setAllJobPosts(filteredJobPosts);
       });

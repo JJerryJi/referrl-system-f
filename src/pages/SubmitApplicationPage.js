@@ -70,7 +70,7 @@ export default function SubmitApplicationPage() {
 
       // Optionally, you can navigate or perform other actions here
       if (data.success===true) {
-        console.log('Application submitted successfully');
+        // console.log('Application submitted successfully');
         setSuccessMessage('Application submitted successfully');
         setErrorMessage('');
         // navigate(`/dashboard/job-posts/${jobId}`);
