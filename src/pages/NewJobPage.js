@@ -25,6 +25,7 @@ export default function NewJobPage() {
   const authToken = new Cookies().get('token');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isFormModified, setIsFormModified] = useState(false);
 
   // Initialize formData state to store form data
   const [formData, setFormData] = useState({
@@ -35,45 +36,9 @@ export default function NewJobPage() {
     job_description: '',
   });
 
-  // validate the form
-  // const validateForm = (formData) => {
-  //   const errors = {};
-
-  //   // Validate job_name 
-  //   const jobNameValidator = /^[a-zA-Z0-9\s-@_]{15,35}$/;
-  //   if (!formData.job_name.trim()) {
-  //     errors.job_name = 'Job Name is required';
-  //   }else if(!jobNameValidator.test(formData.job_name)) {
-  //     errors.job_name = 'Job Name should be 15-35 characters long and may only contain letters, numbers, spaces, and hyphens.';
-  //   }
-
-  //   // Validate job_company 
-  //   const jobCompanyValidator = /^[a-zA-Z0-9\s\-()_[\]!@]{3,64}$/;
-  //   if (!formData.job_company.trim()) {
-  //     errors.job_company = 'Company Name is required';
-  //   } else if (!jobCompanyValidator.test(formData.job_company)) {
-  //     errors.job_company = 'Company Name should be 3-40 characters, including letters, numbers, spaces, and some special symbols';
-  //   }
-    
-  //   if (!formData.job_requirement.trim()) {
-  //     errors.job_requirement = 'Job Requirement is required';
-  //   } else if (formData.job_requirement.trim().length < 10 || formData.job_requirement.trim().length > 1000) {
-  //     errors.job_requirement = 'Job Requirement should be between 10 and 1000 characters.';
-  //   }    
-
-  //   // Validate question 
-  //   if (!formData.job_question.trim()) {
-  //     errors.job_question = 'Job Question is required';
-  //   }
-
-  //   if (!formData.job_description.trim()) {
-  //     errors.job_description = 'Job Description is required';
-  //   } else if (formData.job_description.trim().length < 10 || formData.job_description.trim().length > 1000) {
-  //     errors.job_description = 'Job Description should be between 10 and 1000 characters.';
-  //   }    
-  //   // console.log(errors);
-  //   return errors;
-  // };
+  const handleFormChange = () => {
+    setIsFormModified(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +47,12 @@ export default function NewJobPage() {
     const errors = validateJobPostForm(formData);
 
     if (Object.keys(errors).length === 0) {
-      // No validation errors, proceed with form submission
+      if(!isFormModified){
+          setErrorMessage('You have already submitted a Referral Job Post with the same content. Please make changes before resubmitting.')
+          setSuccessMessage('')
+          return;
+      }
+      // proceed with form submission
       try {
         const response = await fetch('http://127.0.0.1:8000/job/api/posts', {
           method: 'POST',
@@ -99,6 +69,7 @@ export default function NewJobPage() {
           // console.log('Referral Job Post submitted successfully');
           setSuccessMessage('Referral Job Post Successfully Submitted');
           setErrorMessage('');
+          setIsFormModified(false);
           // navigate(`/dashboard/job-posts/${jobId}`);
         } else {
           setErrorMessage(data.error);
@@ -106,7 +77,6 @@ export default function NewJobPage() {
       } catch (error) {
         // console.log(formData);
         console.error('Error:', error);
-        throw new Error(error);
       }
     } else {
       // Validation errors found, display them
@@ -122,6 +92,7 @@ export default function NewJobPage() {
       ...formData,
       [name]: value,
     });
+    handleFormChange();
   };
 
   return (

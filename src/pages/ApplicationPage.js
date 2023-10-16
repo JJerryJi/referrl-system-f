@@ -39,10 +39,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function BlogPage({ authToken }) {
-  // const cookies = new Cookies();
-  // const token = cookies.get('token');
   const token = authToken;
-  // console.log(token);
   const navigate = useNavigate();
 
   // multiple page design
@@ -91,7 +88,13 @@ export default function BlogPage({ authToken }) {
       return a[1] - b[1];
     });
     if (query) {
-      return filter(array, (_user) => _user.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1);
+      return filter(
+        array,
+        (el) =>
+          el.id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          el.status.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+          el.job_id.toString().toLowerCase().indexOf(query.toLowerCase()) !== -1
+      );
     }
     return stabilizedThis.map((el) => el[0]);
   }
@@ -146,7 +149,7 @@ export default function BlogPage({ authToken }) {
         </Stack>
 
         <Card>
-          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar filterName={filterName} onFilterName={handleFilterByName} placeholderText={'Search ...'} />
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -158,64 +161,66 @@ export default function BlogPage({ authToken }) {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {filteredApplication.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((application) => {
-                    /* eslint-disable  */
-                    // console.log(application);
-                    let { id, job_id, modified_date, status } = application;
-                    /* eslint-disable  */
-                    return (
-                      <TableRow hover key={id} tabIndex={-1}>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: '25%' }}>
-                            <Typography variant="subtitle2" noWrap>
-                              {id}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                  {filteredApplication
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((application) => {
+                      /* eslint-disable  */
+                      // console.log(application);
+                      let { id, job_id, modified_date, status } = application;
+                      /* eslint-disable  */
+                      return (
+                        <TableRow hover key={id} tabIndex={-1}>
+                          <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2} sx={{ ml: '25%' }}>
+                              <Typography variant="subtitle2" noWrap>
+                                {id}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
 
-                        <TableCell align="left">
-                          <Button
-                            onClick={() => {
-                              navigate(`/job-posts/${job_id}`);
-                            }}
-                          >
-                            Job {job_id}
-                          </Button>
-                        </TableCell>
-
-                        <TableCell align="left">
-                          {fDateTime(modified_date)} {/* Make sure to format the date as needed */}
-                        </TableCell>
-
-                        <TableCell align="left">
-                          <Label
-                            color={
-                              (status === 'In Progress' && 'info') ||
-                              (status === 'Not-moving-forward' && 'error') ||
-                              'success'
-                            }
-                          >
-                            {sentenceCase(status)}
-                          </Label>
-                        </TableCell>
-
-                        <TableCell align="left">
-                          {status === 'In Progress' && (
+                          <TableCell align="left">
                             <Button
-                              size="small"
-                              color="info"
-                              variant="contained"
                               onClick={() => {
-                                navigate(`/edit-application/${id}`);
+                                navigate(`/job-posts/${job_id}`);
                               }}
                             >
-                              Modify Application
+                              Job {job_id}
                             </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                          </TableCell>
+
+                          <TableCell align="left">
+                            {fDateTime(modified_date)} {/* Make sure to format the date as needed */}
+                          </TableCell>
+
+                          <TableCell align="left">
+                            <Label
+                              color={
+                                (status === 'In Progress' && 'info') ||
+                                (status === 'Not-moving-forward' && 'error') ||
+                                'success'
+                              }
+                            >
+                              {sentenceCase(status)}
+                            </Label>
+                          </TableCell>
+
+                          <TableCell align="left">
+                            {status === 'In Progress' && (
+                              <Button
+                                size="small"
+                                color="info"
+                                variant="contained"
+                                onClick={() => {
+                                  navigate(`/edit-application/${id}`);
+                                }}
+                              >
+                                Modify Application
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />

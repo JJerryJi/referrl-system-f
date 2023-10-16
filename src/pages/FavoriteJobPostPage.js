@@ -36,7 +36,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 const TABLE_HEAD = [
   { id: 'jobId', label: 'Favorite Job Link', alignRight: false },
   { id: 'application_link', label: 'Application Link', alignRight: false },
-  { id: 'AppStatus', label: 'Status', alignRight: false },
+  { id: 'appStatus', label: 'Status', alignRight: false },
   { id: '' },
 ];
 
@@ -46,7 +46,7 @@ export default function FavoriteJobPostPage({ authToken }) {
   // const cookies = new Cookies();
   // const token = cookies.get('token');
   const token = authToken;
-  console.log(token);
+  // console.log(token);
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(null);
@@ -57,14 +57,14 @@ export default function FavoriteJobPostPage({ authToken }) {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [favoriteJobs, setFavoriteJobs] = useState([]);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('');
+  const [orderBy, setOrderBy] = useState('other');
   const [filterName, setFilterName] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleOpenMenu = (event, favoriteJobId) => {
     setOpen(event.currentTarget);
     setSelectedFavoriteJobId(favoriteJobId);
-    console.log(favoriteJobId);
+    console.log('fav id', favoriteJobId);
   };
 
   const handleCloseMenu = () => {
@@ -139,7 +139,7 @@ export default function FavoriteJobPostPage({ authToken }) {
       },
     })
       .then((response) => {
-        response.json();
+        return response.json();
       })
       .then((data) => {
         if (data.success) {
@@ -187,7 +187,6 @@ export default function FavoriteJobPostPage({ authToken }) {
             applicationId: matchingApplication ? matchingApplication.id : '',
           };
         });
-
         setFavoriteJobs(favoriteJobsData);
       } catch (error) {
         console.error('Error fetching favorite jobs:', error);

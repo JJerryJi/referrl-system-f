@@ -49,7 +49,7 @@ export default function AppNewsUpdate({
       <Scrollbar>
         <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
           {list.map((news, index) => (
-            <NewsItem key={index} news={news} id={index} />
+            <NewsItem key={index + page * rowsPerPage} news={news} id={index + page * rowsPerPage} />
           ))}
         </Stack>
       </Scrollbar>

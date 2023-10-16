@@ -44,7 +44,6 @@ export default function ProfilePage() {
   const cookies = new Cookies();
   const token = cookies.get('token');
   const tokenNumber = token?.split(' ')[1];
-  const navigate = useNavigate();
   const [profileData, setProfileData] = useState([]);
   const [error, setErrorMsg] = useState('');
 
@@ -143,7 +142,10 @@ export default function ProfilePage() {
                     }
 
                     if (key === 'graduation_year') {
-                      value = fDateTime(value).split(' ').slice(1, -2).join(' ');
+                      value = fDateTime(value).split(' ').slice(1, 3).join(' ');
+                    }
+                    if (key === 'created_time') {
+                      value = fDateTime(value);
                     }
                     return (
                       <TableRow hover key={key} tabIndex={-1}>
