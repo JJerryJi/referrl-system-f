@@ -24,6 +24,8 @@ import { sentenceCase } from 'change-case';
 import Scrollbar from '../components/scrollbar';
 import { fDateTime } from '../utils/formatTime';
 
+// ----------------------------------------------------------------------
+
 export default function DetailedViewApplicationPage() {
   const { applicationId } = useParams();
   const authToken = new Cookies().get('token');

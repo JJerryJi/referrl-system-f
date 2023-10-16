@@ -21,7 +21,8 @@ import Scrollbar from '../components/scrollbar';
 import Iconify from '../components/iconify';
 
 import { AppTrafficBySite } from '../sections/@dashboard/app'; // Import AppJobPosts instead of AppTrafficBySite
-// ...
+
+// ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   const StyledSearch = styled(OutlinedInput)(({ theme }) => ({

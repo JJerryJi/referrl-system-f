@@ -22,6 +22,8 @@ import { LoadingButton } from '@mui/lab';
 import Scrollbar from '../components/scrollbar';
 import { validateJobPostForm } from '../utils/validateForms';
 
+// ----------------------------------------------------------------------
+
 export default function EditJobPostPage() {
   const { jobId } = useParams();
   const navigate = useNavigate();

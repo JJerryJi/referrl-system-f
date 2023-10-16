@@ -20,6 +20,8 @@ import { LoadingButton } from '@mui/lab';
 
 import Scrollbar from '../components/scrollbar';
 
+// ----------------------------------------------------------------------
+
 export default function EditApplicationPage() {
   const { applicationId } = useParams();
   const navigate = useNavigate();

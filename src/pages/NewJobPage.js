@@ -20,6 +20,8 @@ import { LoadingButton } from '@mui/lab';
 import { validateJobPostForm } from '../utils/validateForms';
 import Scrollbar from '../components/scrollbar';
 
+// ----------------------------------------------------------------------
+
 export default function NewJobPage() {
   const navigate = useNavigate();
   const authToken = new Cookies().get('token');

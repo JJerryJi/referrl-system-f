@@ -4,6 +4,8 @@ import { Grid, Container, Stack, Typography, TablePagination } from '@mui/materi
 import { Helmet } from 'react-helmet-async';
 import { AppNewsUpdate } from '../sections/@dashboard/app';
 
+// ----------------------------------------------------------------------
+
 export default function LeaderBoardPage() {
   const [leadingPosts, setLeadingPosts] = useState([]);
   const [page, setPage] = useState(0);

@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
+import { fDateTime } from '../utils/formatTime';
 import Scrollbar from '../components/scrollbar';
 
 export default function DetailedJobPostPage({ role }) {
@@ -108,6 +109,9 @@ export default function DetailedJobPostPage({ role }) {
                           // Exclude specific keys
                           if (key === 'alumni_id' || key === 'job_review_status' || key === 'job_id') {
                             return null; // Skip rendering this row
+                          }
+                          if (key === 'job_created_time') {
+                            value = fDateTime(value)
                           }
                           const formattedKey = key
                             .split('_')
